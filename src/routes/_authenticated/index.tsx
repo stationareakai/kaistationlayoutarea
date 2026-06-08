@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "KAI Asset — Denah Stasiun" },
@@ -8,11 +8,6 @@ export const Route = createFileRoute("/")({
         name: "description",
         content:
           "Sistem manajemen denah stasiun KAI — kelola area komersial, pelayanan, dan operasional di seluruh Daop & Divre.",
-      },
-      { property: "og:title", content: "KAI Asset — Denah Stasiun" },
-      {
-        property: "og:description",
-        content: "Kelola denah & area aset stasiun KAI dengan mudah.",
       },
     ],
   }),
