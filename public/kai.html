@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KAI Asset — Denah Stasiun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;height:100%;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#eef3fb;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  body{padding:14px;}
+  .app{height:calc(100vh - 28px) !important;box-shadow:0 18px 50px -22px rgba(0,45,122,.45),0 4px 14px -6px rgba(0,45,122,.25);}
+  .lt{font-family:'Space Grotesk',sans-serif !important;font-weight:700 !important;letter-spacing:.01em;font-size:15px !important;}
+  .ls{font-family:'Space Grotesk',sans-serif !important;letter-spacing:.12em;text-transform:uppercase;font-size:9px !important;}
+  .tn{font-family:'Space Grotesk',sans-serif !important;font-weight:600 !important;letter-spacing:.005em;}
+  .wbn h2{font-family:'Space Grotesk',sans-serif !important;font-weight:700 !important;letter-spacing:-.01em;font-size:18px !important;}
+  .sv{font-family:'Space Grotesk',sans-serif !important;font-weight:700 !important;letter-spacing:-.02em;}
+  .mtit, .dgtit, .lsh{font-family:'Space Grotesk',sans-serif !important;}
+  .ipv.big, .ipv.org{font-family:'Space Grotesk',sans-serif !important;font-weight:700 !important;}
+  .ni, input[type=number]{font-family:'JetBrains Mono',monospace !important;}
+  button, input, select, textarea{font-family:inherit;}
+  .sb-body::-webkit-scrollbar{width:6px;}
+  .ipb::-webkit-scrollbar,.la::-webkit-scrollbar,.cwrap::-webkit-scrollbar,.wb::-webkit-scrollbar{width:8px;height:8px;}
+  .ipb::-webkit-scrollbar-thumb,.la::-webkit-scrollbar-thumb,.cwrap::-webkit-scrollbar-thumb,.wb::-webkit-scrollbar-thumb{background:#c8dcf5;border-radius:4px;}
+</style>
+</head>
+<body>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --kb:#003f8f;--kb2:#0055c4;--kb3:#1a6fd8;--kbl:#ddeeff;
+  --ko:#e8650a;--ko2:#f07020;--kol:#fff0e6;
+  --kbg:#f0f5fc;--ksb:#002d7a;
+  --kw:#ffffff;--kt:#0c2a5e;--kt2:#2a5299;--kt3:#6a90c0;
+  --kbd:#c8dcf5;--kbd2:#a0bfe8;
+  --c-green:#16a34a;--c-green-f:rgba(22,163,74,0.22);--c-green-l:#dcfce7;--c-green-t:#14532d;
+  --c-blue:#1a6fd8;--c-blue-f:rgba(26,111,216,0.22);--c-blue-l:#ddeeff;--c-blue-t:#042c53;
+  --c-orange:#e8650a;--c-orange-f:rgba(232,101,10,0.22);--c-orange-l:#fff0e6;--c-orange-t:#7a2d00;
+}
+.app{display:flex;height:700px;border-radius:12px;overflow:hidden;background:var(--kbg);border:1.5px solid var(--kbd2);}
+.sidebar{width:210px;flex-shrink:0;background:var(--ksb);display:flex;flex-direction:column;overflow:hidden;}
+.sb-logo{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+.lm{width:34px;height:34px;background:var(--ko);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lm svg{width:20px;height:20px;fill:#fff;}
+.lt{color:#fff;font-size:14px;font-weight:500;}.ls{color:rgba(255,255,255,0.5);font-size:10px;}
+.sb-search{margin:10px 10px 4px;}
+.sb-search input{width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:7px;padding:6px 10px;font-size:11px;color:#fff;outline:none;}
+.sb-search input::placeholder{color:rgba(255,255,255,0.4);}
+.sb-search input:focus{border-color:var(--ko);}
+.sb-body{flex:1;overflow-y:auto;padding:4px 8px;}
+.sb-body::-webkit-scrollbar{width:3px;}
+.sb-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px;}
+.ghd{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;cursor:pointer;border-radius:6px;font-size:10px;font-weight:500;color:rgba(255,255,255,0.45);user-select:none;text-transform:uppercase;letter-spacing:.05em;}
+.ghd:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);}
+.gi{display:none;}.gi.open{display:block;}
+.si{padding:5px 8px 5px 16px;cursor:pointer;border-radius:6px;font-size:11px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;margin-bottom:1px;}
+.si:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.si.active{background:var(--ko);color:#fff;}
+.sdot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.3);flex-shrink:0;}
+.si.active .sdot{background:#fff;}
+.sb-add{margin:8px;padding:7px;border-radius:7px;border:1px dashed rgba(255,255,255,0.25);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-size:11px;width:calc(100% - 16px);}
+.sb-add:hover{border-color:var(--ko);color:var(--ko);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:50px;background:var(--kb);border-bottom:3px solid var(--ko);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;}
+.tn{font-size:13px;font-weight:500;color:#fff;}.tm{font-size:10px;color:rgba(255,255,255,0.55);margin-top:1px;}
+.tbp{padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;gap:4px;}
+.tbp:hover{background:rgba(255,255,255,0.2);}
+.tabs-bar{display:flex;background:var(--kw);border-bottom:1.5px solid var(--kbd);padding:0 12px;flex-shrink:0;}
+.tab{padding:8px 14px;font-size:11px;cursor:pointer;color:var(--kt3);border-bottom:2.5px solid transparent;margin-bottom:-1.5px;}
+.tab:hover{color:var(--kt2);}.tab.active{color:var(--ko);border-bottom-color:var(--ko);font-weight:500;}
+.tab-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.toolbar-wrap{border-bottom:1px solid var(--kbd);flex-shrink:0;background:var(--kw);}
+.toolbar{padding:7px 12px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.toolbar-row2{padding:4px 12px 7px;display:flex;align-items:center;gap:5px;border-top:1px dashed var(--kbd);}
+.tbtn{padding:5px 10px;border-radius:6px;border:1px solid var(--kbd2);background:var(--kw);color:var(--kt2);cursor:pointer;font-size:11px;display:inline-flex;align-items:center;gap:4px;}
+.tbtn:hover{border-color:var(--kb3);color:var(--kb);}
+.tbtn.ma{background:var(--kb);border-color:var(--kb2);color:#fff;font-weight:500;}
+/* tipe warna: komersial=hijau, pelayanan=biru, operasional=oranye */
+.tbtn.on-k{border-color:var(--c-green);background:var(--c-green-l);color:var(--c-green-t);}
+.tbtn.on-p{border-color:var(--c-blue);background:var(--c-blue-l);color:var(--c-blue-t);}
+.tbtn.on-o{border-color:var(--c-orange);background:var(--c-orange-l);color:var(--c-orange-t);}
+.tbtn.dl{background:var(--ko);border-color:var(--ko2);color:#fff;font-weight:500;}
+.tbtn.dl:hover{background:var(--ko2);}
+.tsep{width:1px;height:16px;background:var(--kbd);margin:0 2px;}
+.cdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ni{width:44px;font-size:11px;padding:4px 7px;border-radius:6px;border:1px solid var(--kbd2);background:var(--kw);color:var(--kt);}
+.tip-box{font-size:10px;color:var(--kt3);background:var(--kbl);border:1px solid var(--kbd);border-radius:5px;padding:3px 8px;line-height:1.5;}
+.tip-box b{color:var(--kb);}
+.leg-row{display:flex;gap:14px;padding:5px 12px;border-bottom:1px solid var(--kbd);flex-shrink:0;flex-wrap:wrap;background:var(--kbl);align-items:center;}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--kt2);}
+.lb{width:12px;height:12px;border-radius:2px;border:1.5px solid;}
+.mhint{margin-left:auto;font-size:10px;color:var(--kt3);font-style:italic;}
+.cwrap{position:relative;flex:1;overflow:auto;background:#ccdff5;cursor:crosshair;}
+.cwrap.sel{cursor:default;}.cwrap.poly{cursor:cell;}
+#cvs{display:block;}
+.noimg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--kt2);font-size:12px;text-align:center;padding:20px;pointer-events:none;}
+.poly-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,63,143,0.88);color:#fff;font-size:11px;padding:5px 14px;border-radius:20px;pointer-events:none;white-space:nowrap;display:none;z-index:5;}
+.poly-hint.show{display:block;}
+.upload-area{padding:16px;overflow:auto;}
+.dz{border:2px dashed var(--kbd2);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;background:var(--kw);}
+.dz:hover{border-color:var(--ko);background:var(--kol);}
+.dz svg{width:38px;height:38px;stroke:var(--kt3);margin:0 auto 10px;display:block;fill:none;}
+.dz p{font-size:12px;color:var(--kt2);}.dz small{font-size:10px;color:var(--kt3);}
+.ug{margin-top:12px;background:var(--kw);border:1px solid var(--kbd);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--kt2);line-height:1.9;}
+.ug ol{padding-left:16px;}
+.la{padding:12px 14px;overflow:auto;flex:1;}
+.lsh{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--kt3);margin:12px 0 6px;display:flex;align-items:center;gap:6px;}
+.lsh::after{content:'';flex:1;height:1px;background:var(--kbd);}
+.li{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:var(--kw);border:1px solid var(--kbd);border-radius:7px;margin-bottom:4px;cursor:pointer;}
+.li:hover{border-color:var(--kbd2);}.li.sel{border-color:var(--ko);background:var(--kol);}
+.ll{display:flex;align-items:center;gap:8px;}
+.lnum{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
+.lname{font-size:12px;color:var(--kt);font-weight:500;}.lsub{font-size:10px;color:var(--kt3);}
+.xbtn{width:20px;height:20px;border-radius:4px;border:1px solid transparent;background:transparent;cursor:pointer;font-size:11px;color:var(--kt3);display:flex;align-items:center;justify-content:center;}
+.xbtn:hover{border-color:#fca5a5;color:#b91c1c;background:#fee2e2;}
+.ip{width:220px;flex-shrink:0;border-left:1px solid var(--kbd);display:flex;flex-direction:column;overflow:hidden;background:var(--kw);}
+.ip.hidden{display:none;}
+.iph{padding:12px;border-bottom:1px solid var(--kbd);}
+.iphr{display:flex;align-items:flex-start;justify-content:space-between;}
+.ipn{font-size:12px;font-weight:500;color:var(--kt);line-height:1.3;}
+.ipbw{margin-top:4px;}
+.ipc{width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:transparent;cursor:pointer;font-size:12px;color:var(--kt3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ipc:hover{background:#fee2e2;color:#b91c1c;}
+.ipb{flex:1;overflow-y:auto;padding:10px 12px;}
+.ipr{margin-bottom:10px;}
+.ipl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--kt3);margin-bottom:2px;}
+.ipv{font-size:12px;color:var(--kt);}.ipv.big{font-size:15px;font-weight:500;color:var(--kb);}
+.ipv.org{color:var(--ko);font-size:14px;font-weight:500;}
+.ipd{height:1px;background:var(--kbd);margin:10px 0;}
+.tbg{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;}
+/* badge warna baru */
+.tg-k{background:var(--c-green-l);color:var(--c-green-t);}
+.tg-p{background:var(--c-blue-l);color:var(--c-blue-t);}
+.tg-o{background:var(--c-orange-l);color:var(--c-orange-t);}
+.stb{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;}
+.st-a{background:#dcfce7;color:#14532d;}.st-k{background:#fee2e2;color:#7f1d1d;}
+.st-p{background:var(--kol);color:#7a2d00;}.st-e{background:#f3f4f6;color:#6b7280;}
+.eabtn{width:100%;padding:7px;border-radius:7px;background:var(--kb);border:none;color:#fff;cursor:pointer;font-size:11px;font-weight:500;}
+.eabtn:hover{background:var(--kb2);}
+.mbg{display:none;position:absolute;inset:0;background:rgba(0,30,80,0.55);z-index:50;align-items:center;justify-content:center;}
+.mbg.open{display:flex;}
+.mbox{background:var(--kw);border:1px solid var(--kbd2);border-radius:12px;width:390px;max-height:92%;overflow-y:auto;border-top:3px solid var(--ko);}
+.mhd{padding:14px 14px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.mtit{font-size:13px;font-weight:500;color:var(--kt);}
+.mb2{padding:0 14px 14px;}
+.fg{margin-bottom:10px;}.fl{font-size:10px;color:var(--kt2);margin-bottom:3px;display:block;font-weight:500;}
+.fi,.fs,.fta{width:100%;font-size:12px;padding:7px 9px;border-radius:7px;border:1px solid var(--kbd2);background:var(--kbg);color:var(--kt);outline:none;font-family:inherit;}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--kb3);background:var(--kw);}
+.fta{resize:vertical;min-height:55px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mft{padding:0 14px 14px;display:flex;justify-content:flex-end;gap:6px;}
+.tg2{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.to2{border:1.5px solid var(--kbd);border-radius:7px;padding:9px 5px;cursor:pointer;text-align:center;background:var(--kbg);}
+.to2:hover{border-color:var(--kbd2);}
+/* selected tipe warna baru */
+.to2.sel-k{border-color:var(--c-green);background:var(--c-green-l);}
+.to2.sel-p{border-color:var(--c-blue);background:var(--c-blue-l);}
+.to2.sel-o{border-color:var(--c-orange);background:var(--c-orange-l);}
+.to2 .ti2{font-size:17px;margin-bottom:2px;}.to2 .tn2{font-size:10px;font-weight:500;color:var(--kt2);}
+.div2{height:1px;background:var(--kbd);margin:9px 0;}
+.mb3{padding:6px 13px;border-radius:7px;border:1px solid var(--kbd2);background:var(--kbg);color:var(--kt2);cursor:pointer;font-size:11px;}
+.mb3:hover{background:var(--kbl);color:var(--kb);}
+.mb3.pr{background:var(--kb);border-color:var(--kb);color:#fff;font-weight:500;}
+.mb3.pr:hover{background:var(--kb2);}
+.mb3.dn{border-color:#fca5a5;color:#b91c1c;}
+.mb3.dn:hover{background:#fee2e2;}
+.wb{padding:16px;overflow:auto;flex:1;}
+.wbn{background:var(--kb);border-radius:10px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.wbn-s{position:absolute;right:0;top:0;bottom:0;width:8px;background:var(--ko);}
+.wbn h2{font-size:15px;font-weight:500;color:#fff;margin-bottom:5px;}
+.wbn p{font-size:11px;color:rgba(255,255,255,0.65);line-height:1.6;max-width:400px;}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.sc2{background:var(--kw);border:1px solid var(--kbd);border-radius:8px;padding:11px 13px;}
+.sl{font-size:10px;color:var(--kt3);margin-bottom:4px;}.sv{font-size:22px;font-weight:500;}
+.sv.b{color:var(--kb);}.sv.o{color:var(--ko);}
+.dgtit{font-size:10px;font-weight:500;color:var(--kt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.dc{background:var(--kw);border:1px solid var(--kbd);border-radius:8px;padding:11px;cursor:pointer;}
+.dc:hover{border-color:var(--ko);background:var(--kol);}
+.dca{font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;margin-bottom:5px;display:inline-block;}
+.bd{background:var(--kbl);color:var(--kb);}.bv{background:#ede9fe;color:#4c1d95;}
+.dc h4{font-size:11px;font-weight:500;color:var(--kt);margin-bottom:1px;}.dc p{font-size:10px;color:var(--kt3);}
+</style>
+
+<div class="app" id="app" style="position:relative;">
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="lm"><svg viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 4h16v8H4V8zm2 2v4h12v-4H6zm-2 8h16v2H4v-2z"/></svg></div>
+    <div><div class="lt">KAI Asset</div><div class="ls">Denah Stasiun</div></div>
+  </div>
+  <div class="sb-search"><input type="text" placeholder="Cari stasiun..." oninput="filterNav(this.value)"></div>
+  <div class="sb-body" id="sb-body"></div>
+  <button class="sb-add" onclick="showAddStn()">+ Tambah Stasiun</button>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><div class="tn" id="stn-name">Dashboard KAI</div><div class="tm" id="stn-meta">Pilih stasiun dari sidebar</div></div>
+    <div style="display:flex;gap:6px;">
+      <button class="tbp" onclick="goHome()">⌂ Beranda</button>
+      <button class="tbp" onclick="exportJSON()">↓ Export JSON</button>
+    </div>
+  </div>
+  <div class="tabs-bar" id="tabs-bar" style="display:none;">
+    <div class="tab active" id="tab-d" onclick="switchTab('denah',this)">🗺 Denah</div>
+    <div class="tab" id="tab-u" onclick="switchTab('upload',this)">↑ Upload Denah</div>
+    <div class="tab" id="tab-l" onclick="switchTab('list',this)">☰ Daftar Area</div>
+  </div>
+  <div class="tab-content" id="tcon">
+
+    <div id="pw" class="wb">
+      <div class="wbn"><div class="wbn-s"></div>
+        <h2>Sistem Manajemen Denah Stasiun KAI</h2>
+        <p>Kelola aset area komersial, pelayanan, dan operasional seluruh stasiun — Daop 1–9 dan Divre I–IV.</p>
+      </div>
+      <div class="sg" id="dstats"></div>
+      <div class="dgtit">Daerah Operasi &amp; Divisi Regional</div>
+      <div class="dg" id="dgrid"></div>
+    </div>
+
+    <div id="ps" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+      <div id="pd" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="leg-row">
+          <!-- legenda warna baru -->
+          <div class="leg"><div class="lb" style="background:rgba(22,163,74,0.22);border-color:#16a34a;"></div>Komersial</div>
+          <div class="leg"><div class="lb" style="background:rgba(26,111,216,0.22);border-color:#1a6fd8;"></div>Pelayanan</div>
+          <div class="leg"><div class="lb" style="background:rgba(232,101,10,0.22);border-color:#e8650a;"></div>Operasional</div>
+          <div class="mhint" id="mhint">Mode: Pilih/Klik</div>
+        </div>
+        <div class="toolbar-wrap">
+          <div class="toolbar">
+            <span style="font-size:10px;color:var(--kt3);font-weight:500;">MODE:</span>
+            <button class="tbtn" id="bs" onclick="setTool('select')">↖ Pilih/Klik</button>
+            <button class="tbtn" id="br" onclick="setTool('rect')">▭ Kotak</button>
+            <button class="tbtn" id="bpo" onclick="setTool('poly')">⬡ Titik-Titik</button>
+            <div class="tsep"></div>
+            <span style="font-size:10px;color:var(--kt3);">Tipe:</span>
+            <button class="tbtn on-k" id="bk" onclick="setType('k')"><div class="cdot" style="background:#16a34a;"></div>Komersial</button>
+            <button class="tbtn" id="bpl" onclick="setType('p')"><div class="cdot" style="background:#1a6fd8;"></div>Pelayanan</button>
+            <button class="tbtn" id="bo" onclick="setType('o')"><div class="cdot" style="background:#e8650a;"></div>Operasional</button>
+            <div class="tsep"></div>
+            <span style="font-size:10px;color:var(--kt3);">No:</span>
+            <input class="ni" type="number" id="nn" min="1" value="1">
+            <div class="tsep"></div>
+            <button class="tbtn dl" onclick="downloadDenah()">⬇ Download</button>
+          </div>
+          <div class="toolbar-row2">
+            <div class="tip-box" id="tip-box">Pilih mode di atas untuk mulai menambahkan area pada denah.</div>
+          </div>
+        </div>
+        <div class="cwrap" id="cwrap">
+          <canvas id="cvs"></canvas>
+          <div class="noimg" id="noimg">
+            <div style="font-size:36px;">🏢</div>
+            <div style="color:var(--kt2);font-weight:500;">Belum ada gambar denah</div>
+            <div style="font-size:11px;color:var(--kt3);">Upload gambar di tab <b>Upload Denah</b></div>
+          </div>
+          <div class="poly-hint" id="poly-hint">Klik titik pertama 🟠 untuk menutup — atau double-click</div>
+        </div>
+        <div style="position:relative;height:0;overflow:visible;">
+          <div style="position:absolute;bottom:10px;right:10px;display:flex;align-items:center;gap:3px;background:var(--kw);border:1px solid var(--kbd2);border-radius:7px;padding:3px 5px;">
+            <button style="width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:transparent;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--kt2);" onclick="doZoom(-0.15)">−</button>
+            <span style="font-size:10px;color:var(--kt3);min-width:32px;text-align:center;" id="zlbl">100%</span>
+            <button style="width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:transparent;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--kt2);" onclick="doZoom(0.15)">+</button>
+            <button style="width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:transparent;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--kt2);" onclick="resetZoom()">⊡</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pu" style="display:none;flex:1;overflow:auto;">
+        <div class="upload-area">
+          <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
+            <svg viewBox="0 0 24 24" stroke-width="1.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <p>Klik atau drag &amp; drop gambar denah stasiun</p>
+            <small>Format PNG / JPG — maks 15 MB</small>
+          </div>
+          <input type="file" id="fi" accept="image/*" style="display:none;" onchange="doUpload(this)">
+          <div class="ug">
+            <b style="color:var(--kb);">Cara pakai:</b>
+            <ol>
+              <li>Upload gambar denah stasiun (PNG/JPG)</li>
+              <li>Buka tab <b>Denah</b> — gambar jadi latar belakang</li>
+              <li>Pilih mode <b>Kotak</b> atau <b>Titik-Titik</b></li>
+              <li>Pilih tipe area lalu gambar di atas denah</li>
+              <li>Klik area untuk melihat info, double-click untuk edit</li>
+              <li>Untuk hapus area: edit info → tombol Hapus</li>
+            </ol>
+          </div>
+          <div id="prevs" style="display:none;margin-top:12px;">
+            <div style="font-size:10px;color:var(--kt3);margin-bottom:5px;">Denah aktif:</div>
+            <img id="previ" style="max-width:100%;border-radius:8px;border:1px solid var(--kbd2);display:block;">
+            <button class="tbtn" style="margin-top:8px;font-size:11px;color:#b91c1c;border-color:#fca5a5;" onclick="removeBg()">🗑 Hapus Gambar Denah</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pl" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+        <div class="la" id="lcont"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ip hidden" id="ip">
+  <div class="iph">
+    <div class="iphr"><div class="ipn" id="ipn">—</div><button class="ipc" onclick="closeInfo()">✕</button></div>
+    <div class="ipbw" id="ipbw"></div>
+  </div>
+  <div class="ipb" id="ipb"></div>
+</div>
+
+<!-- MODAL AREA -->
+<div class="mbg" id="ma">
+  <div class="mbox">
+    <div class="mhd"><div class="mtit" id="mtit">Info Area</div><button class="ipc" onclick="closeM('ma')">✕</button></div>
+    <div class="mb2">
+      <div class="fg"><label class="fl">Nama / Nomor Area *</label><input class="fi" id="an" placeholder="Kios A1, Loket 2, R. Kepala Stasiun..."></div>
+      <div class="fg"><label class="fl">Tipe Area</label>
+        <div class="tg2" id="tg2">
+          <div class="to2" data-t="komersial" onclick="pickT(this,'komersial')"><div class="ti2">🏪</div><div class="tn2">Komersial</div></div>
+          <div class="to2" data-t="pelayanan" onclick="pickT(this,'pelayanan')"><div class="ti2">🏥</div><div class="tn2">Pelayanan</div></div>
+          <div class="to2" data-t="operasional" onclick="pickT(this,'operasional')"><div class="ti2">⚙️</div><div class="tn2">Operasional</div></div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Peruntukan</label><input class="fi" id="ap" placeholder="Minimarket, Loket Tiket, Ruang Kontrol..."></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Luas (m²)</label><input class="fi" id="al" type="number" placeholder="0"></div>
+        <div class="fg"><label class="fl">Lantai</label><input class="fi" id="alt2" placeholder="GF / 1 / 2"></div>
+      </div>
+      <div id="kf">
+        <div class="div2"></div>
+        <div class="fg"><label class="fl">Nama Penyewa</label><input class="fi" id="ape" placeholder="Nama perusahaan / individu"></div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Nilai Sewa / Tahun (Rp)</label><input class="fi" id="as2" type="number" placeholder="0"></div>
+          <div class="fg"><label class="fl">Masa Sewa</label><input class="fi" id="ams" placeholder="2023–2026"></div>
+        </div>
+        <div class="fg"><label class="fl">Status Sewa</label>
+          <select class="fs" id="ast"><option value="aktif">Aktif</option><option value="kosong">Kosong</option><option value="proses">Dalam Proses</option><option value="expired">Expired</option></select>
+        </div>
+        <div class="fg"><label class="fl">Catatan</label><textarea class="fta" id="ac" placeholder="Keterangan tambahan..."></textarea></div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="mb3" onclick="closeM('ma')">Batal</button>
+      <button class="mb3 dn" onclick="delArea()">🗑 Hapus Area</button>
+      <button class="mb3 pr" onclick="saveArea()">✓ Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STASIUN -->
+<div class="mbg" id="ms">
+  <div class="mbox">
+    <div class="mhd"><div class="mtit">Tambah Stasiun Baru</div><button class="ipc" onclick="closeM('ms')">✕</button></div>
+    <div class="mb2">
+      <div class="fg"><label class="fl">Nama Stasiun *</label><input class="fi" id="nsn" placeholder="Stasiun Gambir"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Kode</label><input class="fi" id="nsc" placeholder="GMR"></div>
+        <div class="fg"><label class="fl">Kota</label><input class="fi" id="nsk" placeholder="Jakarta Pusat"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Kelompok *</label>
+          <select class="fs" id="nsg"><option>Daop 1</option><option>Daop 2</option><option>Daop 3</option><option>Daop 4</option><option>Daop 5</option><option>Daop 6</option><option>Daop 7</option><option>Daop 8</option><option>Daop 9</option><option>Divre I</option><option>Divre II</option><option>Divre III</option><option>Divre IV</option></select>
+        </div>
+        <div class="fg"><label class="fl">Kelas</label><select class="fs" id="nsl"><option>Besar</option><option>Madya</option><option>Kecil</option></select></div>
+      </div>
+    </div>
+    <div class="mft"><button class="mb3" onclick="closeM('ms')">Batal</button><button class="mb3 pr" onclick="addStn()">Tambah Stasiun</button></div>
+  </div>
+</div>
+</div>
+
+<script>
+const GROUPS=[
+  {id:'Daop 1',city:'Jakarta',t:'d'},{id:'Daop 2',city:'Bandung',t:'d'},{id:'Daop 3',city:'Cirebon',t:'d'},
+  {id:'Daop 4',city:'Semarang',t:'d'},{id:'Daop 5',city:'Purwokerto',t:'d'},{id:'Daop 6',city:'Yogyakarta',t:'d'},
+  {id:'Daop 7',city:'Madiun',t:'d'},{id:'Daop 8',city:'Surabaya',t:'d'},{id:'Daop 9',city:'Jember',t:'d'},
+  {id:'Divre I',city:'Sumut',t:'v'},{id:'Divre II',city:'Sumbar',t:'v'},{id:'Divre III',city:'Sumsel',t:'v'},{id:'Divre IV',city:'Tanjungkarang',t:'v'},
+];
+let stations=JSON.parse(localStorage.getItem('kai_v6')||'null')||[
+  {id:'s1',name:'Stasiun Gambir',code:'GMR',kota:'Jakarta Pusat',group:'Daop 1',kelas:'Besar',image:null,areas:[]},
+  {id:'s2',name:'Stasiun Pasar Senen',code:'PSE',kota:'Jakarta Pusat',group:'Daop 1',kelas:'Besar',image:null,areas:[]},
+  {id:'s3',name:'Stasiun Bandung',code:'BD',kota:'Bandung',group:'Daop 2',kelas:'Besar',image:null,areas:[]},
+  {id:'s4',name:'Stasiun Kiaracondong',code:'KAC',kota:'Bandung',group:'Daop 2',kelas:'Madya',image:null,areas:[]},
+  {id:'s5',name:'Stasiun Cirebon',code:'CN',kota:'Cirebon',group:'Daop 3',kelas:'Besar',image:null,areas:[]},
+  {id:'s6',name:'Stasiun Tawang',code:'TW',kota:'Semarang',group:'Daop 4',kelas:'Besar',image:null,areas:[]},
+  {id:'s7',name:'Stasiun Yogyakarta',code:'YK',kota:'Yogyakarta',group:'Daop 6',kelas:'Besar',image:null,areas:[]},
+  {id:'s8',name:'Stasiun Surabaya Gubeng',code:'SGU',kota:'Surabaya',group:'Daop 8',kelas:'Besar',image:null,areas:[]},
+  {id:'s9',name:'Stasiun Medan',code:'MDN',kota:'Medan',group:'Divre I',kelas:'Besar',image:null,areas:[]},
+  {id:'s10',name:'Stasiun Padang',code:'PD',kota:'Padang',group:'Divre II',kelas:'Besar',image:null,areas:[]},
+];
+const save=()=>localStorage.setItem('kai_v6',JSON.stringify(stations));
+
+let cur=null,tool='select',typ='komersial';
+let drawing=false,sx=0,sy=0,selId=null,editId=null,bgImg=null;
+let polyPts=[],polyDrawing=false,mouseX=0,mouseY=0;
+let cvs,ctx,scale=1;
+
+// Warna baru: komersial=hijau, pelayanan=biru, operasional=oranye
+const TC={
+  komersial:{fill:'rgba(22,163,74,0.22)',stroke:'#16a34a',numBg:'#16a34a',numTxt:'#fff',labelTxt:'#14532d',labelBg:'rgba(220,252,231,0.90)'},
+  pelayanan: {fill:'rgba(26,111,216,0.22)',stroke:'#1a6fd8',numBg:'#1a6fd8',numTxt:'#fff',labelTxt:'#042c53',labelBg:'rgba(220,238,255,0.90)'},
+  operasional:{fill:'rgba(232,101,10,0.22)',stroke:'#e8650a',numBg:'#e8650a',numTxt:'#fff',labelTxt:'#7a2d00',labelBg:'rgba(255,240,230,0.90)'},
+};
+
+const TIPS={
+  select:'<b>Pilih/Klik:</b> Klik area untuk lihat info. Double-click untuk edit. Hapus area melalui tombol Hapus di form edit.',
+  rect:'<b>Mode Kotak:</b> Klik dan drag pada denah untuk menggambar area persegi panjang.',
+  poly:'<b>Mode Titik-Titik:</b> Klik satu per satu sudut area tidak beraturan. Klik titik pertama untuk menutup. Esc untuk batal.',
+};
+
+function getCanvasPos(e){
+  const r=cvs.getBoundingClientRect();
+  return{x:(e.clientX-r.left)/scale,y:(e.clientY-r.top)/scale};
+}
+
+function buildNav(){
+  const el=document.getElementById('sb-body');el.innerHTML='';
+  GROUPS.forEach(g=>{
+    const gs=stations.filter(s=>s.group===g.id);
+    const d=document.createElement('div');
+    d.innerHTML=`<div class="ghd" onclick="tgl(this)"><span>${g.id} — ${g.city}</span><span>›</span></div>
+    <div class="gi" id="gi-${g.id.replace(/\s/,'_')}">
+      ${gs.map(s=>`<div class="si" id="si-${s.id}" onclick="openStn('${s.id}')"><div class="sdot"></div>${s.name.replace('Stasiun ','')}</div>`).join('')}
+      ${!gs.length?'<div style="padding:3px 8px 3px 18px;font-size:10px;color:rgba(255,255,255,0.3);">—</div>':''}
+    </div>`;
+    el.appendChild(d);
+  });
+}
+function tgl(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('open');}
+function filterNav(q){document.querySelectorAll('.si').forEach(e=>{e.style.display=e.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});}
+
+function buildDash(){
+  const tot=stations.reduce((a,s)=>a+s.areas.length,0);
+  const k=stations.reduce((a,s)=>a+s.areas.filter(r=>r.type==='komersial').length,0);
+  const p=stations.reduce((a,s)=>a+s.areas.filter(r=>r.type==='pelayanan').length,0);
+  document.getElementById('dstats').innerHTML=`
+    <div class="sc2"><div class="sl">Total Stasiun</div><div class="sv b">${stations.length}</div></div>
+    <div class="sc2"><div class="sl">Total Area</div><div class="sv b">${tot}</div></div>
+    <div class="sc2"><div class="sl">Komersial</div><div class="sv" style="color:#16a34a;">${k}</div></div>
+    <div class="sc2"><div class="sl">Pelayanan</div><div class="sv b">${p}</div></div>`;
+  document.getElementById('dgrid').innerHTML=GROUPS.map(g=>{
+    const cnt=stations.filter(s=>s.group===g.id).length;
+    return`<div class="dc" onclick="clickGrp('${g.id}')"><div class="dca ${g.t==='d'?'bd':'bv'}">${g.id}</div><h4>${g.city}</h4><p>${cnt} stasiun</p></div>`;
+  }).join('');
+}
+function clickGrp(gid){const gs=stations.filter(s=>s.group===gid);const el=document.getElementById('gi-'+gid.replace(/\s/,'_'));if(el){el.classList.add('open');el.previousElementSibling.classList.add('open');}if(gs.length)openStn(gs[0].id);}
+function goHome(){cur=null;document.getElementById('pw').style.display='';document.getElementById('ps').style.display='none';document.getElementById('tabs-bar').style.display='none';document.getElementById('stn-name').textContent='Dashboard KAI';document.getElementById('stn-meta').textContent='Pilih stasiun dari sidebar';document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));closeInfo();buildDash();}
+function openStn(id){
+  cur=stations.find(s=>s.id===id);if(!cur)return;
+  document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));
+  const ni=document.getElementById('si-'+id);
+  if(ni){ni.classList.add('active');const g=ni.closest('.gi');if(g){g.classList.add('open');g.previousElementSibling.classList.add('open');}}
+  document.getElementById('stn-name').textContent=cur.name;
+  document.getElementById('stn-meta').textContent=`${cur.code} — ${cur.kota} | ${cur.group} | Kelas ${cur.kelas}`;
+  document.getElementById('pw').style.display='none';document.getElementById('ps').style.display='flex';
+  document.getElementById('tabs-bar').style.display='flex';
+  switchTab('denah',document.getElementById('tab-d'));
+}
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');
+  document.getElementById('pd').style.display=name==='denah'?'flex':'none';
+  document.getElementById('pu').style.display=name==='upload'?'flex':'none';
+  document.getElementById('pl').style.display=name==='list'?'flex':'none';
+  if(name==='denah')setTimeout(initCvs,20);
+  if(name==='list')buildList();
+  if(name==='upload')buildPrev();
+}
+
+function initCvs(){
+  cvs=document.getElementById('cvs');ctx=cvs.getContext('2d');bgImg=null;
+  document.getElementById('noimg').style.display=cur&&cur.image?'none':'flex';
+  if(cur&&cur.image){
+    const img=new Image();img.onload=()=>{bgImg=img;resizeCvs();redraw();};img.src=cur.image;
+  } else {
+    const w=document.getElementById('cwrap').clientWidth||600;
+    cvs.width=w;cvs.height=Math.max(400,Math.round(w*0.55));redraw();
+  }
+  cvs.onmousedown=mdown;cvs.onmousemove=mmove;cvs.onmouseup=mup;cvs.ondblclick=mdbl;
+  cvs.oncontextmenu=e=>{e.preventDefault();if(tool==='poly'&&polyDrawing)cancelPoly();};
+  document.addEventListener('keydown',onKey);
+}
+function resizeCvs(){if(!bgImg)return;cvs.width=Math.round(bgImg.naturalWidth*scale);cvs.height=Math.round(bgImg.naturalHeight*scale);}
+function onKey(e){if(e.key==='Escape'&&tool==='poly'&&polyDrawing)cancelPoly();}
+
+function redraw(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  if(bgImg&&bgImg.complete&&bgImg.naturalWidth){ctx.drawImage(bgImg,0,0,cvs.width,cvs.height);}
+  else{ctx.fillStyle='#ccdff5';ctx.fillRect(0,0,cvs.width,cvs.height);drawGrid();}
+  if(!cur)return;
+  cur.areas.forEach(a=>{const sa=scaleA(a,scale);drawAreaD(sa,a.id===selId);});
+  if(tool==='poly'&&polyDrawing&&polyPts.length>0){
+    drawPolyIP(polyPts.map(p=>({x:p.x*scale,y:p.y*scale})),mouseX*scale,mouseY*scale);
+  }
+}
+function drawGrid(){ctx.strokeStyle='rgba(0,63,143,0.08)';ctx.lineWidth=1;for(let x=0;x<cvs.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cvs.height);ctx.stroke();}for(let y=0;y<cvs.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cvs.width,y);ctx.stroke();}}
+function scaleA(a,s){
+  if(a.shape==='poly'&&a.points)return{...a,points:a.points.map(p=>({x:p.x*s,y:p.y*s})),x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
+  return{...a,x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
+}
+function drawAreaD(a,sel){
+  const c=TC[a.type]||TC.komersial;
+  if(a.shape==='poly'&&a.points&&a.points.length>2){
+    drawPolyS(ctx,a.points,c,sel);
+    drawLbl(ctx,a,c,polyCen(a.points),a.points);
+  } else {
+    ctx.fillStyle=c.fill;ctx.fillRect(a.x,a.y,a.w,a.h);
+    ctx.strokeStyle=sel?'#002060':c.stroke;ctx.lineWidth=sel?2.5:1.5;ctx.strokeRect(a.x,a.y,a.w,a.h);
+    drawLbl(ctx,a,c,{x:a.x+a.w/2,y:a.y+a.h/2},null,{w:a.w,h:a.h});
+  }
+}
+function drawPolyS(oc,pts,c,sel){
+  oc.beginPath();oc.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>oc.lineTo(p.x,p.y));oc.closePath();
+  oc.fillStyle=c.fill;oc.fill();oc.strokeStyle=sel?'#002060':c.stroke;oc.lineWidth=sel?2.5:1.5;oc.stroke();
+}
+function drawLbl(oc,a,c,cen,pts,sz){
+  const nr=10;let nx,ny;
+  if(pts){const bb=polyBB(pts);nx=bb.x+nr+3;ny=bb.y+nr+3;}else{nx=a.x+nr+3;ny=a.y+nr+3;}
+  oc.fillStyle=c.numBg;oc.beginPath();oc.arc(nx,ny,nr,0,Math.PI*2);oc.fill();
+  oc.fillStyle=c.numTxt;oc.font='bold 8px Plus Jakarta Sans, system-ui, sans-serif';oc.textAlign='center';oc.textBaseline='middle';oc.fillText(String(a.num||'?'),nx,ny);
+  if(a.nama&&cen){
+    const fs=9;oc.font=`bold ${fs}px Plus Jakarta Sans, system-ui, sans-serif`;
+    const tw=oc.measureText(a.nama).width,pw=tw+8,ph=fs+5;
+    oc.fillStyle=c.labelBg;oc.beginPath();oc.roundRect(cen.x-pw/2,cen.y-ph/2,pw,ph,3);oc.fill();
+    oc.fillStyle=c.labelTxt;oc.textAlign='center';oc.textBaseline='middle';
+    if(sz){oc.save();oc.beginPath();oc.rect(a.x+3,a.y+3,sz.w-6,sz.h-6);oc.clip();}
+    oc.fillText(a.nama,cen.x,cen.y);if(sz)oc.restore();
+  }
+}
+function drawPolyIP(pts,mx,my){
+  const c=TC[typ];
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(mx,my);ctx.closePath();ctx.fillStyle=c.fill;ctx.fill();
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(mx,my);ctx.strokeStyle=c.stroke;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
+  pts.forEach((p,i)=>{ctx.beginPath();ctx.arc(p.x,p.y,i===0?7:4,0,Math.PI*2);ctx.fillStyle=i===0?'#e8650a':c.stroke;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();});
+  ctx.beginPath();ctx.arc(mx,my,3,0,Math.PI*2);ctx.fillStyle=c.stroke;ctx.fill();
+}
+function polyCen(pts){let x=0,y=0;pts.forEach(p=>{x+=p.x;y+=p.y;});return{x:x/pts.length,y:y/pts.length};}
+function polyBB(pts){const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);return{x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)};}
+function polyA2(pts){let a=0;for(let i=0;i<pts.length;i++){const j=(i+1)%pts.length;a+=pts[i].x*pts[j].y-pts[j].x*pts[i].y;}return Math.abs(a/2);}
+
+function mdown(e){
+  const{x,y}=getCanvasPos(e);
+  if(tool==='select'){const h=hitTest(x,y);selId=h?h.id:null;redraw();if(h)showInfo(h);else closeInfo();}
+  else if(tool==='rect'){drawing=true;sx=x;sy=y;}
+  else if(tool==='poly'){
+    if(!polyDrawing){polyDrawing=true;polyPts=[];}
+    if(polyPts.length>=3){const fp=polyPts[0],dx=x-fp.x,dy=y-fp.y;if(Math.sqrt(dx*dx+dy*dy)<12){closePoly();return;}}
+    polyPts.push({x,y});document.getElementById('poly-hint').classList.toggle('show',polyPts.length>=3);redraw();
+  }
+}
+function mmove(e){
+  const{x,y}=getCanvasPos(e);mouseX=x;mouseY=y;
+  if(tool==='rect'&&drawing){redraw();const c=TC[typ];ctx.fillStyle=c.fill;ctx.strokeStyle=c.stroke;ctx.lineWidth=1.5;ctx.setLineDash([6,3]);const rx=Math.min(sx,x),ry=Math.min(sy,y),rw=Math.abs(x-sx),rh=Math.abs(y-sy);ctx.fillRect(rx,ry,rw,rh);ctx.strokeRect(rx,ry,rw,rh);ctx.setLineDash([]);}
+  else if(tool==='poly'&&polyDrawing)redraw();
+}
+function mup(e){
+  if(tool==='rect'&&drawing){
+    drawing=false;const{x,y}=getCanvasPos(e);
+    const rx=Math.min(sx,x),ry=Math.min(sy,y),rw=Math.abs(x-sx),rh=Math.abs(y-sy);
+    if(rw<10||rh<10){redraw();return;}
+    const num=parseInt(document.getElementById('nn').value)||1;
+    const a={id:'a'+Date.now(),num,type:typ,shape:'rect',x:rx,y:ry,w:rw,h:rh,nama:'',peruntukan:'',luas:Math.round(rw*rh/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+    cur.areas.push(a);save();document.getElementById('nn').value=num+1;selId=a.id;redraw();openAM(a);
+  }
+}
+function mdbl(e){
+  if(tool==='select'){const{x,y}=getCanvasPos(e);const h=hitTest(x,y);if(h)openAM(h);}
+  if(tool==='poly'&&polyDrawing&&polyPts.length>=3)closePoly();
+}
+function closePoly(){
+  polyDrawing=false;document.getElementById('poly-hint').classList.remove('show');
+  if(polyPts.length<3){polyPts=[];redraw();return;}
+  const num=parseInt(document.getElementById('nn').value)||1;
+  const bb=polyBB(polyPts);
+  const a={id:'a'+Date.now(),num,type:typ,shape:'poly',points:[...polyPts],x:bb.x,y:bb.y,w:bb.w,h:bb.h,nama:'',peruntukan:'',luas:Math.round(polyA2(polyPts)/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+  polyPts=[];cur.areas.push(a);save();document.getElementById('nn').value=num+1;selId=a.id;redraw();openAM(a);
+}
+function cancelPoly(){polyDrawing=false;polyPts=[];document.getElementById('poly-hint').classList.remove('show');redraw();}
+function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
+function ptInPoly(x,y,pts){let inside=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const xi=pts[i].x,yi=pts[i].y,xj=pts[j].x,yj=pts[j].y;if((yi>y)!=(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)inside=!inside;}return inside;}
+
+function doZoom(d){scale=Math.min(3,Math.max(0.3,+(scale+d).toFixed(2)));document.getElementById('zlbl').textContent=Math.round(scale*100)+'%';if(bgImg&&bgImg.naturalWidth)resizeCvs();redraw();}
+function resetZoom(){scale=1;document.getElementById('zlbl').textContent='100%';if(bgImg&&bgImg.naturalWidth)resizeCvs();redraw();}
+
+function setTool(t){
+  if(tool==='poly'&&polyDrawing)cancelPoly();tool=t;
+  ['bs','br','bpo'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('ma');});
+  const map={select:'bs',rect:'br',poly:'bpo'};if(map[t])document.getElementById(map[t]).classList.add('ma');
+  document.getElementById('cwrap').className='cwrap'+(t==='select'?' sel':t==='poly'?' poly':'');
+  document.getElementById('mhint').textContent={select:'Mode: Pilih/Klik',rect:'Mode: Gambar Kotak',poly:'Mode: Titik-Titik (Polygon)'}[t];
+  document.getElementById('tip-box').innerHTML=TIPS[t];
+}
+function setType(k){
+  typ={k:'komersial',p:'pelayanan',o:'operasional'}[k];
+  const cls={k:'on-k',p:'on-p',o:'on-o'};
+  ['k','pl','o'].forEach(x=>{const b=document.getElementById('b'+x);if(b)b.className='tbtn'+(x===k?' '+cls[x]:'');});
+}
+
+// openAM — set selected class sesuai warna tipe
+function openAM(a){
+  editId=a.id;
+  document.getElementById('an').value=a.nama||'';document.getElementById('ap').value=a.peruntukan||'';
+  document.getElementById('al').value=a.luas||'';document.getElementById('alt2').value=a.lantai||'';
+  document.getElementById('ape').value=a.penyewa||'';document.getElementById('as2').value=a.sewa||'';
+  document.getElementById('ams').value=a.masaSewa||'';document.getElementById('ast').value=a.status||'aktif';
+  document.getElementById('ac').value=a.catatan||'';
+  // hapus semua sel class dulu
+  document.querySelectorAll('.to2').forEach(e=>{e.classList.remove('sel-k','sel-p','sel-o');});
+  // set sel sesuai tipe
+  const selCls={komersial:'sel-k',pelayanan:'sel-p',operasional:'sel-o'}[a.type];
+  document.querySelector(`.to2[data-t="${a.type}"]`)?.classList.add(selCls);
+  document.getElementById('kf').style.display=a.type==='komersial'?'':'none';
+  document.getElementById('mtit').textContent=a.nama?'Edit: '+a.nama:'Area #'+(a.num||'?');
+  document.getElementById('ma').classList.add('open');
+}
+function pickT(el,t){
+  document.querySelectorAll('.to2').forEach(e=>e.classList.remove('sel-k','sel-p','sel-o'));
+  const selCls={komersial:'sel-k',pelayanan:'sel-p',operasional:'sel-o'}[t];
+  el.classList.add(selCls);
+  document.getElementById('kf').style.display=t==='komersial'?'':'none';
+}
+function saveArea(){
+  if(!editId||!cur)return;const a=cur.areas.find(x=>x.id===editId);if(!a)return;
+  a.nama=document.getElementById('an').value;
+  const selEl=document.querySelector('.to2.sel-k, .to2.sel-p, .to2.sel-o');
+  if(selEl)a.type=selEl.dataset.t;
+  a.peruntukan=document.getElementById('ap').value;a.luas=parseFloat(document.getElementById('al').value)||0;
+  a.lantai=document.getElementById('alt2').value;a.penyewa=document.getElementById('ape').value;
+  a.sewa=parseFloat(document.getElementById('as2').value)||0;a.masaSewa=document.getElementById('ams').value;
+  a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
+  save();closeM('ma');redraw();buildList();showInfo(a);
+}
+function delArea(){
+  if(!editId||!cur||!confirm('Hapus area ini?'))return;
+  cur.areas=cur.areas.filter(a=>a.id!==editId);save();closeM('ma');closeInfo();selId=null;redraw();buildList();
+}
+
+function showInfo(a){
+  const tl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[a.type];
+  const cls={komersial:'tg-k',pelayanan:'tg-p',operasional:'tg-o'}[a.type];
+  const shp=a.shape==='poly'?'⬡ Polygon':'▭ Kotak';
+  document.getElementById('ipn').textContent=a.nama||(a.num?'Area #'+a.num:'Tanpa nama');
+  document.getElementById('ipbw').innerHTML=`<span class="tbg ${cls}">${tl}</span> <span style="font-size:10px;color:var(--kt3);margin-left:4px;">${shp}</span>`;
+  let h=`<div class="ipr"><div class="ipl">No. Area</div><div class="ipv big">${a.num||'—'}</div></div>
+    <div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
+    <div class="ipr"><div class="ipl">Luas</div><div class="ipv big">${a.luas||'—'} <span style="font-size:11px;color:var(--kt3);">m²</span></div></div>
+    <div class="ipr"><div class="ipl">Lantai</div><div class="ipv">${a.lantai||'—'}</div></div>`;
+  if(a.type==='komersial'){
+    const sc2=a.status||'aktif';const scls={aktif:'st-a',kosong:'st-k',proses:'st-p',expired:'st-e'}[sc2]||'st-e';
+    h+=`<div class="ipd"></div>
+      <div class="ipr"><div class="ipl">Penyewa</div><div class="ipv" style="font-weight:500;">${a.penyewa||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org">Rp ${a.sewa?a.sewa.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Masa Sewa</div><div class="ipv">${a.masaSewa||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Status</div><span class="stb ${scls}">${sc2}</span></div>
+      ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
+  }
+  h+=`<div class="ipd"></div><button class="eabtn" onclick="openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏ Edit Info Area</button>`;
+  document.getElementById('ipb').innerHTML=h;document.getElementById('ip').classList.remove('hidden');
+}
+function closeInfo(){document.getElementById('ip').classList.add('hidden');}
+
+function buildList(){
+  if(!cur){document.getElementById('lcont').innerHTML='';return;}
+  const areas=cur.areas;
+  if(!areas.length){document.getElementById('lcont').innerHTML='<div style="text-align:center;padding:32px;font-size:12px;color:var(--kt3);">Belum ada area. Gunakan tab Denah untuk menggambar.</div>';return;}
+  const g={komersial:[],pelayanan:[],operasional:[]};areas.forEach(a=>{if(g[a.type])g[a.type].push(a);});
+  let h='';
+  ['komersial','pelayanan','operasional'].forEach(type=>{
+    if(!g[type].length)return;
+    const c=TC[type];const lbl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[type];
+    h+=`<div class="lsh">${lbl} (${g[type].length})</div>`;
+    g[type].sort((a,b)=>(a.num||999)-(b.num||999)).forEach(a=>{
+      const shp=a.shape==='poly'?'⬡':'▭';
+      h+=`<div class="li ${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
+        <div class="ll">
+          <div class="lnum" style="background:${c.fill};color:${c.numBg};border:1.5px solid ${c.stroke};">${a.num||'?'}</div>
+          <div><div class="lname">${shp} ${a.nama||'(Tanpa nama)'}</div><div class="lsub">${a.peruntukan||''}${a.luas?' • '+a.luas+' m²':''}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          ${type==='komersial'&&a.penyewa?`<span style="font-size:10px;color:var(--c-green);max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.penyewa}</span>`:''}
+          <button class="xbtn" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('lcont').innerHTML=h;
+}
+function hlArea(id){selId=id;const a=cur.areas.find(x=>x.id===id);if(a){buildList();showInfo(a);switchTab('denah',document.getElementById('tab-d'));}}
+function qdel(id){if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
+
+function doUpload(inp){
+  const f=inp.files[0];if(!f||!cur)return;
+  if(f.size>15*1024*1024){alert('File terlalu besar! Maks 15 MB.');return;}
+  const r=new FileReader();r.onload=e=>{cur.image=e.target.result;save();buildPrev();switchTab('denah',document.getElementById('tab-d'));setTimeout(initCvs,30);};r.readAsDataURL(f);
+}
+function buildPrev(){const ps=document.getElementById('prevs');if(cur&&cur.image){ps.style.display='';document.getElementById('previ').src=cur.image;}else ps.style.display='none';}
+function removeBg(){if(!confirm('Hapus gambar denah?'))return;cur.image=null;save();buildPrev();bgImg=null;scale=1;document.getElementById('noimg').style.display='flex';redraw();}
+const dzel=document.getElementById('dz');
+dzel.addEventListener('dragover',e=>{e.preventDefault();dzel.style.borderColor='var(--ko)';dzel.style.background='var(--kol)';});
+dzel.addEventListener('dragleave',()=>{dzel.style.borderColor='';dzel.style.background='';});
+dzel.addEventListener('drop',e=>{e.preventDefault();dzel.style.borderColor='';dzel.style.background='';const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){try{const dt=new DataTransfer();dt.items.add(f);document.getElementById('fi').files=dt.files;doUpload(document.getElementById('fi'));}catch(err){alert('Gunakan tombol klik.');}}});
+
+function downloadDenah(){
+  if(!cur){alert('Pilih stasiun dulu.');return;}
+  const prevSel=selId;selId=null;
+  const pad=48,iW=bgImg?bgImg.naturalWidth:cvs.width,iH=bgImg?bgImg.naturalHeight:cvs.height;
+  const oc2=document.createElement('canvas');oc2.width=iW;oc2.height=iH+pad;
+  const oc=oc2.getContext('2d');
+  oc.fillStyle='#f0f5fc';oc.fillRect(0,0,oc2.width,oc2.height);
+  oc.fillStyle='#003f8f';oc.fillRect(0,0,oc2.width,pad);oc.fillStyle='#e8650a';oc.fillRect(0,pad-4,oc2.width,4);
+  oc.fillStyle='#fff';oc.font='bold 14px Plus Jakarta Sans, system-ui, sans-serif';oc.textAlign='left';oc.textBaseline='middle';oc.fillText(cur.name+' — Denah Area',12,pad/2);
+  const ds=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  oc.font='11px Plus Jakarta Sans, system-ui, sans-serif';oc.fillStyle='rgba(255,255,255,0.7)';oc.textAlign='right';oc.fillText(cur.group+' | '+ds,oc2.width-12,pad/2);
+  if(bgImg&&bgImg.complete&&bgImg.naturalWidth)oc.drawImage(bgImg,0,pad,iW,iH);
+  else{oc.fillStyle='#ccdff5';oc.fillRect(0,pad,iW,iH);}
+  cur.areas.forEach(a=>{
+    const c=TC[a.type]||TC.komersial;
+    if(a.shape==='poly'&&a.points){
+      const pts=a.points.map(p=>({x:p.x,y:p.y+pad}));
+      drawPolyS(oc,pts,c,false);drawLbl(oc,{...a},c,polyCen(pts),pts);
+    } else {
+      const a2={...a,y:a.y+pad};
+      oc.fillStyle=c.fill;oc.fillRect(a2.x,a2.y,a2.w,a2.h);oc.strokeStyle=c.stroke;oc.lineWidth=1.5;oc.strokeRect(a2.x,a2.y,a2.w,a2.h);
+      drawLbl(oc,a2,c,{x:a2.x+a2.w/2,y:a2.y+a2.h/2},null,{w:a2.w,h:a2.h});
+    }
+  });
+  let lx=12;
+  [{t:'komersial',l:'Komersial'},{t:'pelayanan',l:'Pelayanan'},{t:'operasional',l:'Operasional'}].forEach(({t,l})=>{
+    const c=TC[t];oc.fillStyle=c.fill;oc.strokeStyle=c.stroke;oc.lineWidth=1;oc.fillRect(lx,oc2.height-18,12,12);oc.strokeRect(lx,oc2.height-18,12,12);
+    oc.fillStyle='#0c2a5e';oc.font='10px Plus Jakarta Sans, system-ui, sans-serif';oc.textAlign='left';oc.textBaseline='middle';oc.fillText(l,lx+16,oc2.height-12);lx+=72;
+  });
+  selId=prevSel;redraw();
+  const link=document.createElement('a');link.download=(cur.code||'denah')+'-denah.png';link.href=oc2.toDataURL('image/png');link.click();
+}
+
+function showAddStn(){document.getElementById('ms').classList.add('open');}
+function addStn(){
+  const name=document.getElementById('nsn').value.trim();if(!name){alert('Nama stasiun wajib!');return;}
+  const s={id:'s'+Date.now(),name:name.startsWith('Stasiun')?name:'Stasiun '+name,code:document.getElementById('nsc').value.toUpperCase(),kota:document.getElementById('nsk').value,group:document.getElementById('nsg').value,kelas:document.getElementById('nsl').value,image:null,areas:[]};
+  stations.push(s);save();buildNav();buildDash();closeM('ms');openStn(s.id);
+}
+function exportJSON(){if(!cur){alert('Pilih stasiun dulu.');return;}const b=new Blob([JSON.stringify(cur,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(cur.code||'stn')+'.json';a.click();}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mbg').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+
+buildNav();buildDash();
+setTimeout(()=>{const f=document.querySelector('.ghd');if(f){f.classList.add('open');f.nextElementSibling.classList.add('open');}},60);
+</script>
+
+</body>
+</html>
