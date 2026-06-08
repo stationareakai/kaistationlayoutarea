@@ -23,7 +23,15 @@
   .sb-body::-webkit-scrollbar{width:6px;}
   .ipb::-webkit-scrollbar,.la::-webkit-scrollbar,.cwrap::-webkit-scrollbar,.wb::-webkit-scrollbar{width:8px;height:8px;}
   .ipb::-webkit-scrollbar-thumb,.la::-webkit-scrollbar-thumb,.cwrap::-webkit-scrollbar-thumb,.wb::-webkit-scrollbar-thumb{background:#c8dcf5;border-radius:4px;}
+  .uchip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.85);border:1px solid #e2e8f0;padding:5px 10px;border-radius:999px;font-size:12px;color:#0f172a;font-weight:600;}
+  .uchip .rb{font-size:10px;padding:2px 7px;border-radius:999px;background:#0f172a;color:#fff;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+  .uchip .rb.viewer{background:#475569;}
+  .uchip .rb.admin{background:linear-gradient(135deg,#ea580c,#b91c1c);}
+  .lobtn{background:#fff;border:1px solid #e2e8f0;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer;}
+  .lobtn:hover{background:#fef2f2;}
+  .ro-banner{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;z-index:1000;box-shadow:0 8px 24px -8px rgba(0,0,0,.3);}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -198,9 +206,11 @@
 <div class="main">
   <div class="topbar">
     <div><div class="tn" id="stn-name">Dashboard KAI</div><div class="tm" id="stn-meta">Pilih stasiun dari sidebar</div></div>
-    <div style="display:flex;gap:6px;">
+    <div style="display:flex;gap:8px;align-items:center;">
       <button class="tbp" onclick="goHome()">⌂ Beranda</button>
       <button class="tbp" onclick="exportJSON()">↓ Export JSON</button>
+      <div id="userChip" class="uchip" style="display:none;"><span id="userEmail">—</span><span id="userRole" class="rb viewer">viewer</span></div>
+      <button class="lobtn" onclick="logout()">Logout</button>
     </div>
   </div>
   <div class="tabs-bar" id="tabs-bar" style="display:none;">
@@ -379,7 +389,7 @@ const GROUPS=[
   {id:'Daop 7',city:'Madiun',t:'d'},{id:'Daop 8',city:'Surabaya',t:'d'},{id:'Daop 9',city:'Jember',t:'d'},
   {id:'Divre I',city:'Sumut',t:'v'},{id:'Divre II',city:'Sumbar',t:'v'},{id:'Divre III',city:'Sumsel',t:'v'},{id:'Divre IV',city:'Tanjungkarang',t:'v'},
 ];
-let stations=JSON.parse(localStorage.getItem('kai_v6')||'null')||[
+const DEFAULT_STATIONS=[
   {id:'s1',name:'Stasiun Gambir',code:'GMR',kota:'Jakarta Pusat',group:'Daop 1',kelas:'Besar',image:null,areas:[]},
   {id:'s2',name:'Stasiun Pasar Senen',code:'PSE',kota:'Jakarta Pusat',group:'Daop 1',kelas:'Besar',image:null,areas:[]},
   {id:'s3',name:'Stasiun Bandung',code:'BD',kota:'Bandung',group:'Daop 2',kelas:'Besar',image:null,areas:[]},
@@ -391,7 +401,34 @@ let stations=JSON.parse(localStorage.getItem('kai_v6')||'null')||[
   {id:'s9',name:'Stasiun Medan',code:'MDN',kota:'Medan',group:'Divre I',kelas:'Besar',image:null,areas:[]},
   {id:'s10',name:'Stasiun Padang',code:'PD',kota:'Padang',group:'Divre II',kelas:'Besar',image:null,areas:[]},
 ];
-const save=()=>localStorage.setItem('kai_v6',JSON.stringify(stations));
+let stations=[];
+
+// ============== Cloud storage (Lovable Cloud) ==============
+const SB_URL='https://sagjjbkcwiafzuwbjrve.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZ2pqYmtjd2lhZnp1d2JqcnZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MDQ5ODUsImV4cCI6MjA5NjQ4MDk4NX0.ou2rrQ-juuKYIEY0U2jF3ZTNTDstkO8Q32kp_dZt5G4';
+const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storage:localStorage,persistSession:true,autoRefreshToken:true}});
+let CURRENT_USER=null, IS_ADMIN=false, SAVE_TIMER=null;
+function gotoAuth(){ try{ window.top.location='/auth'; }catch(_){ window.location='/auth'; } }
+async function logout(){ try{ await sb.auth.signOut(); }catch(_){} gotoAuth(); }
+function showReadOnly(){
+  if(document.getElementById('roBanner'))return;
+  const b=document.createElement('div');b.id='roBanner';b.className='ro-banner';
+  b.textContent='Mode Lihat Saja — hanya admin yang dapat mengubah denah';
+  document.body.appendChild(b);
+}
+function save(){
+  if(!IS_ADMIN){
+    showReadOnly();
+    return;
+  }
+  clearTimeout(SAVE_TIMER);
+  SAVE_TIMER=setTimeout(async()=>{
+    try{
+      const {error}=await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:CURRENT_USER?.id||null});
+      if(error){console.error('Save error',error);alert('Gagal menyimpan: '+error.message);}
+    }catch(e){console.error(e);}
+  },400);
+}
 
 let cur=null,tool='select',typ='komersial';
 let drawing=false,sx=0,sy=0,selId=null,editId=null,bgImg=null;
@@ -746,8 +783,32 @@ function exportJSON(){if(!cur){alert('Pilih stasiun dulu.');return;}const b=new 
 function closeM(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.mbg').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 
-buildNav();buildDash();
-setTimeout(()=>{const f=document.querySelector('.ghd');if(f){f.classList.add('open');f.nextElementSibling.classList.add('open');}},60);
+async function bootstrap(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user){gotoAuth();return;}
+  CURRENT_USER=user;
+  // Detect admin via user_roles
+  const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',user.id);
+  IS_ADMIN=Array.isArray(roles)&&roles.some(r=>r.role==='admin');
+  const chip=document.getElementById('userChip');
+  if(chip){chip.style.display='flex';document.getElementById('userEmail').textContent=user.email||'';const rb=document.getElementById('userRole');rb.textContent=IS_ADMIN?'admin':'viewer';rb.className='rb '+(IS_ADMIN?'admin':'viewer');}
+  // Load shared data
+  const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
+  if(error){console.error(error);}
+  if(row && Array.isArray(row.data) && row.data.length){stations=row.data;}
+  else{
+    stations=JSON.parse(JSON.stringify(DEFAULT_STATIONS));
+    if(IS_ADMIN){
+      try{ await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:user.id}); }catch(_){}
+    }
+  }
+  if(!IS_ADMIN){showReadOnly();}
+  buildNav();buildDash();
+  setTimeout(()=>{const f=document.querySelector('.ghd');if(f){f.classList.add('open');f.nextElementSibling.classList.add('open');}},60);
+  // Listen for sign-out from other tabs
+  sb.auth.onAuthStateChange((e,s)=>{ if(e==='SIGNED_OUT'||!s){gotoAuth();} });
+}
+bootstrap();
 </script>
 
 </body>
