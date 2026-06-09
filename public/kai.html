@@ -720,8 +720,15 @@ function openAM(a){
   editId=a.id;
   document.getElementById('an').value=a.nama||'';document.getElementById('ap').value=a.peruntukan||'';
   document.getElementById('al').value=a.luas||'';document.getElementById('alt2').value=a.lantai||'';
-  document.getElementById('ape').value=a.penyewa||'';document.getElementById('as2').value=a.sewa||'';
-  document.getElementById('ams').value=a.masaSewa||'';document.getElementById('ast').value=a.status||'aktif';
+  document.getElementById('ape').value=a.penyewa||'';
+  document.getElementById('asPokok').value=a.nilaiPokok||'';
+  document.getElementById('asAdmin').value=a.biayaAdmin||'';
+  document.getElementById('asCom').value=a.com||'';
+  document.getElementById('asPpn').value=a.ppn||'';
+  calcTotal();
+  document.getElementById('ams').value=a.masaSewa||'';
+  document.getElementById('ajw').value=a.jangkaWaktu||'';
+  document.getElementById('ast').value=a.status||'aktif';
   document.getElementById('ac').value=a.catatan||'';
   // hapus semua sel class dulu
   document.querySelectorAll('.to2').forEach(e=>{e.classList.remove('sel-k','sel-p','sel-o');});
