@@ -45,7 +45,7 @@ function AuthPage() {
         });
         if (error) throw error;
         setInfo(
-          "Akun dibuat. Jika diperlukan, cek email Anda untuk verifikasi sebelum login.",
+          "Akun berhasil dibuat. Akses Anda menunggu persetujuan admin — admin akan menetapkan role (Editor / Viewer) sebelum Anda dapat menggunakan aplikasi.",
         );
         setMode("login");
       } else {
