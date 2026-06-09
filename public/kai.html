@@ -381,6 +381,18 @@
     <div class="mft"><button class="mb3" onclick="closeM('ms')">Batal</button><button class="mb3 pr" onclick="addStn()">Tambah Stasiun</button></div>
   </div>
 </div>
+
+<!-- MODAL ADMIN PANEL -->
+<div class="mbg" id="mAdmin">
+  <div class="mbox" style="max-width:640px;">
+    <div class="mhd"><div class="mtit">Kelola Pengguna &amp; Role</div><button class="ipc" onclick="closeM('mAdmin')">✕</button></div>
+    <div class="mb2">
+      <p style="font-size:13px;color:#475569;margin:0 0 12px;">Tetapkan role untuk setiap pengguna. Hanya admin & editor yang dapat mengubah denah. Viewer hanya bisa melihat.</p>
+      <div id="userList" style="display:grid;gap:8px;max-height:55vh;overflow:auto;"></div>
+    </div>
+    <div class="mft"><button class="mb3 pr" onclick="closeM('mAdmin')">Tutup</button></div>
+  </div>
+</div>
 </div>
 
 <script>
