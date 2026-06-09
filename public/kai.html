@@ -346,8 +346,17 @@
         <div class="div2"></div>
         <div class="fg"><label class="fl">Nama Penyewa</label><input class="fi" id="ape" placeholder="Nama perusahaan / individu"></div>
         <div class="fr">
-          <div class="fg"><label class="fl">Nilai Sewa / Tahun (Rp)</label><input class="fi" id="as2" type="number" placeholder="0"></div>
+          <div class="fg"><label class="fl">Nilai Pokok (Rp)</label><input class="fi" id="asPokok" type="number" placeholder="0" oninput="calcTotal()"></div>
+          <div class="fg"><label class="fl">Biaya Administrasi (Rp)</label><input class="fi" id="asAdmin" type="number" placeholder="0" oninput="calcTotal()"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">COM (Rp)</label><input class="fi" id="asCom" type="number" placeholder="0" oninput="calcTotal()"></div>
+          <div class="fg"><label class="fl">PPN (Rp)</label><input class="fi" id="asPpn" type="number" placeholder="0" oninput="calcTotal()"></div>
+        </div>
+        <div class="fg"><label class="fl">Total Nilai Sewa (Rp)</label><input class="fi" id="as2" type="number" placeholder="0" readonly style="background:#f5f7fb;font-weight:700;color:#d97706;"></div>
+        <div class="fr">
           <div class="fg"><label class="fl">Masa Sewa</label><input class="fi" id="ams" placeholder="2023–2026"></div>
+          <div class="fg"><label class="fl">Jangka Waktu</label><input class="fi" id="ajw" placeholder="3 tahun"></div>
         </div>
         <div class="fg"><label class="fl">Status Sewa</label>
           <select class="fs" id="ast"><option value="aktif">Aktif</option><option value="kosong">Kosong</option><option value="proses">Dalam Proses</option><option value="expired">Expired</option></select>
