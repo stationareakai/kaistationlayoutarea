@@ -855,22 +855,35 @@ async function bootstrap(){
   const {data:{user}}=await sb.auth.getUser();
   if(!user){gotoAuth();return;}
   CURRENT_USER=user;
-  // Detect admin via user_roles
+  // Detect role via user_roles
   const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',user.id);
-  IS_ADMIN=Array.isArray(roles)&&roles.some(r=>r.role==='admin');
+  const myRoles=Array.isArray(roles)?roles.map(r=>r.role):[];
+  IS_ADMIN=myRoles.includes('admin');
+  IS_EDITOR=myRoles.includes('editor');
+  IS_WRITER=IS_ADMIN||IS_EDITOR;
+  MY_ROLE=IS_ADMIN?'admin':(IS_EDITOR?'editor':(myRoles.includes('viewer')?'viewer':''));
   const chip=document.getElementById('userChip');
-  if(chip){chip.style.display='flex';document.getElementById('userEmail').textContent=user.email||'';const rb=document.getElementById('userRole');rb.textContent=IS_ADMIN?'admin':'viewer';rb.className='rb '+(IS_ADMIN?'admin':'viewer');}
+  if(chip){
+    chip.style.display='flex';
+    document.getElementById('userEmail').textContent=user.email||'';
+    const rb=document.getElementById('userRole');
+    const lbl=MY_ROLE||'menunggu';
+    rb.textContent=lbl;
+    rb.className='rb '+(MY_ROLE||'viewer');
+  }
+  const adminBtn=document.getElementById('adminBtn');
+  if(adminBtn && IS_ADMIN) adminBtn.style.display='inline-flex';
   // Load shared data
   const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
   if(error){console.error(error);}
   if(row && Array.isArray(row.data) && row.data.length){stations=row.data;}
   else{
     stations=JSON.parse(JSON.stringify(DEFAULT_STATIONS));
-    if(IS_ADMIN){
+    if(IS_WRITER){
       try{ await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:user.id}); }catch(_){}
     }
   }
-  if(!IS_ADMIN){showReadOnly();}
+  if(!IS_WRITER){showReadOnly();}
   buildNav();buildDash();
   setTimeout(()=>{const f=document.querySelector('.ghd');if(f){f.classList.add('open');f.nextElementSibling.classList.add('open');}},60);
   // Listen for sign-out from other tabs
