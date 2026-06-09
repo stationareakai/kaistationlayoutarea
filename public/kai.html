@@ -745,6 +745,13 @@ function pickT(el,t){
   el.classList.add(selCls);
   document.getElementById('kf').style.display=t==='komersial'?'':'none';
 }
+function calcTotal(){
+  const p=parseFloat(document.getElementById('asPokok').value)||0;
+  const ad=parseFloat(document.getElementById('asAdmin').value)||0;
+  const c=parseFloat(document.getElementById('asCom').value)||0;
+  const pp=parseFloat(document.getElementById('asPpn').value)||0;
+  document.getElementById('as2').value=p+ad+c+pp;
+}
 function saveArea(){
   if(!editId||!cur)return;const a=cur.areas.find(x=>x.id===editId);if(!a)return;
   a.nama=document.getElementById('an').value;
