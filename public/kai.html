@@ -346,8 +346,17 @@
         <div class="div2"></div>
         <div class="fg"><label class="fl">Nama Penyewa</label><input class="fi" id="ape" placeholder="Nama perusahaan / individu"></div>
         <div class="fr">
-          <div class="fg"><label class="fl">Nilai Sewa / Tahun (Rp)</label><input class="fi" id="as2" type="number" placeholder="0"></div>
+          <div class="fg"><label class="fl">Nilai Pokok (Rp)</label><input class="fi" id="asPokok" type="number" placeholder="0" oninput="calcTotal()"></div>
+          <div class="fg"><label class="fl">Biaya Administrasi (Rp)</label><input class="fi" id="asAdmin" type="number" placeholder="0" oninput="calcTotal()"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label class="fl">COM (Rp)</label><input class="fi" id="asCom" type="number" placeholder="0" oninput="calcTotal()"></div>
+          <div class="fg"><label class="fl">PPN (Rp)</label><input class="fi" id="asPpn" type="number" placeholder="0" oninput="calcTotal()"></div>
+        </div>
+        <div class="fg"><label class="fl">Total Nilai Sewa (Rp)</label><input class="fi" id="as2" type="number" placeholder="0" readonly style="background:#f5f7fb;font-weight:700;color:#d97706;"></div>
+        <div class="fr">
           <div class="fg"><label class="fl">Masa Sewa</label><input class="fi" id="ams" placeholder="2023–2026"></div>
+          <div class="fg"><label class="fl">Jangka Waktu</label><input class="fi" id="ajw" placeholder="3 tahun"></div>
         </div>
         <div class="fg"><label class="fl">Status Sewa</label>
           <select class="fs" id="ast"><option value="aktif">Aktif</option><option value="kosong">Kosong</option><option value="proses">Dalam Proses</option><option value="expired">Expired</option></select>
@@ -711,8 +720,15 @@ function openAM(a){
   editId=a.id;
   document.getElementById('an').value=a.nama||'';document.getElementById('ap').value=a.peruntukan||'';
   document.getElementById('al').value=a.luas||'';document.getElementById('alt2').value=a.lantai||'';
-  document.getElementById('ape').value=a.penyewa||'';document.getElementById('as2').value=a.sewa||'';
-  document.getElementById('ams').value=a.masaSewa||'';document.getElementById('ast').value=a.status||'aktif';
+  document.getElementById('ape').value=a.penyewa||'';
+  document.getElementById('asPokok').value=a.nilaiPokok||'';
+  document.getElementById('asAdmin').value=a.biayaAdmin||'';
+  document.getElementById('asCom').value=a.com||'';
+  document.getElementById('asPpn').value=a.ppn||'';
+  calcTotal();
+  document.getElementById('ams').value=a.masaSewa||'';
+  document.getElementById('ajw').value=a.jangkaWaktu||'';
+  document.getElementById('ast').value=a.status||'aktif';
   document.getElementById('ac').value=a.catatan||'';
   // hapus semua sel class dulu
   document.querySelectorAll('.to2').forEach(e=>{e.classList.remove('sel-k','sel-p','sel-o');});
@@ -729,6 +745,13 @@ function pickT(el,t){
   el.classList.add(selCls);
   document.getElementById('kf').style.display=t==='komersial'?'':'none';
 }
+function calcTotal(){
+  const p=parseFloat(document.getElementById('asPokok').value)||0;
+  const ad=parseFloat(document.getElementById('asAdmin').value)||0;
+  const c=parseFloat(document.getElementById('asCom').value)||0;
+  const pp=parseFloat(document.getElementById('asPpn').value)||0;
+  document.getElementById('as2').value=p+ad+c+pp;
+}
 function saveArea(){
   if(!editId||!cur)return;const a=cur.areas.find(x=>x.id===editId);if(!a)return;
   a.nama=document.getElementById('an').value;
@@ -736,7 +759,13 @@ function saveArea(){
   if(selEl)a.type=selEl.dataset.t;
   a.peruntukan=document.getElementById('ap').value;a.luas=parseFloat(document.getElementById('al').value)||0;
   a.lantai=document.getElementById('alt2').value;a.penyewa=document.getElementById('ape').value;
-  a.sewa=parseFloat(document.getElementById('as2').value)||0;a.masaSewa=document.getElementById('ams').value;
+  a.nilaiPokok=parseFloat(document.getElementById('asPokok').value)||0;
+  a.biayaAdmin=parseFloat(document.getElementById('asAdmin').value)||0;
+  a.com=parseFloat(document.getElementById('asCom').value)||0;
+  a.ppn=parseFloat(document.getElementById('asPpn').value)||0;
+  a.sewa=a.nilaiPokok+a.biayaAdmin+a.com+a.ppn;
+  a.masaSewa=document.getElementById('ams').value;
+  a.jangkaWaktu=document.getElementById('ajw').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
   save();closeM('ma');redraw();buildList();showInfo(a);
 }
@@ -759,8 +788,13 @@ function showInfo(a){
     const sc2=a.status||'aktif';const scls={aktif:'st-a',kosong:'st-k',proses:'st-p',expired:'st-e'}[sc2]||'st-e';
     h+=`<div class="ipd"></div>
       <div class="ipr"><div class="ipl">Penyewa</div><div class="ipv" style="font-weight:500;">${a.penyewa||'—'}</div></div>
-      <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org">Rp ${a.sewa?a.sewa.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Nilai Pokok</div><div class="ipv">Rp ${a.nilaiPokok?a.nilaiPokok.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Biaya Administrasi</div><div class="ipv">Rp ${a.biayaAdmin?a.biayaAdmin.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">COM</div><div class="ipv">Rp ${a.com?a.com.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">PPN</div><div class="ipv">Rp ${a.ppn?a.ppn.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Total Nilai Sewa</div><div class="ipv org" style="font-weight:700;">Rp ${a.sewa?a.sewa.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Masa Sewa</div><div class="ipv">${a.masaSewa||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
       <div class="ipr"><div class="ipl">Status</div><span class="stb ${scls}">${sc2}</span></div>
       ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
   }
