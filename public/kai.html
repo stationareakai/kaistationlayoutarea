@@ -27,6 +27,8 @@
   .uchip .rb{font-size:10px;padding:2px 7px;border-radius:999px;background:#0f172a;color:#fff;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
   .uchip .rb.viewer{background:#475569;}
   .uchip .rb.admin{background:linear-gradient(135deg,#ea580c,#b91c1c);}
+  .uchip .rb.editor{background:linear-gradient(135deg,#1d4ed8,#4338ca);}
+  .uchip .rb.menunggu{background:#9ca3af;}
   .lobtn{background:#fff;border:1px solid #e2e8f0;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer;}
   .lobtn:hover{background:#fef2f2;}
   .ro-banner{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;z-index:1000;box-shadow:0 8px 24px -8px rgba(0,0,0,.3);}
@@ -210,6 +212,7 @@
       <button class="tbp" onclick="goHome()">⌂ Beranda</button>
       <button class="tbp" onclick="exportJSON()">↓ Export JSON</button>
       <div id="userChip" class="uchip" style="display:none;"><span id="userEmail">—</span><span id="userRole" class="rb viewer">viewer</span></div>
+      <button class="lobtn" id="adminBtn" onclick="openAdminPanel()" style="display:none;background:linear-gradient(135deg,#1d4ed8,#4338ca);color:#fff;border:0;">👥 Kelola User</button>
       <button class="lobtn" onclick="logout()">Logout</button>
     </div>
   </div>
@@ -380,6 +383,18 @@
     <div class="mft"><button class="mb3" onclick="closeM('ms')">Batal</button><button class="mb3 pr" onclick="addStn()">Tambah Stasiun</button></div>
   </div>
 </div>
+
+<!-- MODAL ADMIN PANEL -->
+<div class="mbg" id="mAdmin">
+  <div class="mbox" style="max-width:640px;">
+    <div class="mhd"><div class="mtit">Kelola Pengguna &amp; Role</div><button class="ipc" onclick="closeM('mAdmin')">✕</button></div>
+    <div class="mb2">
+      <p style="font-size:13px;color:#475569;margin:0 0 12px;">Tetapkan role untuk setiap pengguna. Hanya admin & editor yang dapat mengubah denah. Viewer hanya bisa melihat.</p>
+      <div id="userList" style="display:grid;gap:8px;max-height:55vh;overflow:auto;"></div>
+    </div>
+    <div class="mft"><button class="mb3 pr" onclick="closeM('mAdmin')">Tutup</button></div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -407,17 +422,17 @@ let stations=[];
 const SB_URL='https://sagjjbkcwiafzuwbjrve.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZ2pqYmtjd2lhZnp1d2JqcnZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MDQ5ODUsImV4cCI6MjA5NjQ4MDk4NX0.ou2rrQ-juuKYIEY0U2jF3ZTNTDstkO8Q32kp_dZt5G4';
 const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storage:localStorage,persistSession:true,autoRefreshToken:true}});
-let CURRENT_USER=null, IS_ADMIN=false, SAVE_TIMER=null;
+let CURRENT_USER=null, IS_ADMIN=false, IS_EDITOR=false, IS_WRITER=false, MY_ROLE='', SAVE_TIMER=null;
 function gotoAuth(){ try{ window.top.location='/auth'; }catch(_){ window.location='/auth'; } }
 async function logout(){ try{ await sb.auth.signOut(); }catch(_){} gotoAuth(); }
 function showReadOnly(){
   if(document.getElementById('roBanner'))return;
   const b=document.createElement('div');b.id='roBanner';b.className='ro-banner';
-  b.textContent='Mode Lihat Saja — hanya admin yang dapat mengubah denah';
+  b.textContent = MY_ROLE ? 'Mode Lihat Saja — hanya admin & editor yang dapat mengubah denah' : 'Akun Anda belum memiliki role. Hubungi admin untuk diberi akses (editor/viewer).';
   document.body.appendChild(b);
 }
 function save(){
-  if(!IS_ADMIN){
+  if(!IS_WRITER){
     showReadOnly();
     return;
   }
@@ -428,6 +443,61 @@ function save(){
       if(error){console.error('Save error',error);alert('Gagal menyimpan: '+error.message);}
     }catch(e){console.error(e);}
   },400);
+}
+
+// ===== Admin user management =====
+function openAdminPanel(){ if(!IS_ADMIN)return; document.getElementById('mAdmin').classList.add('open'); loadUsers(); }
+async function loadUsers(){
+  const list=document.getElementById('userList');
+  list.innerHTML='<div style="padding:14px;color:#64748b;font-size:13px;">Memuat...</div>';
+  const [{data:profiles,error:pe},{data:roles,error:re}]=await Promise.all([
+    sb.from('profiles').select('id,email,full_name').order('created_at',{ascending:true}),
+    sb.from('user_roles').select('user_id,role,id')
+  ]);
+  if(pe||re){list.innerHTML='<div style="padding:14px;color:#b91c1c;font-size:13px;">Gagal memuat: '+((pe||re).message)+'</div>';return;}
+  const roleMap={};(roles||[]).forEach(r=>{roleMap[r.user_id]=r;});
+  list.innerHTML='';
+  (profiles||[]).forEach(p=>{
+    const r=roleMap[p.id];
+    const role=r?r.role:'';
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;';
+    row.innerHTML=`
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.full_name||'(tanpa nama)'}</div>
+        <div style="font-size:12px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.email||''}</div>
+      </div>
+      <select class="fs roleSel" style="width:130px;padding:7px;font-size:13px;">
+        <option value="">— belum —</option>
+        <option value="viewer" ${role==='viewer'?'selected':''}>Viewer</option>
+        <option value="editor" ${role==='editor'?'selected':''}>Editor</option>
+        <option value="admin"  ${role==='admin' ?'selected':''}>Admin</option>
+      </select>
+      <button class="mb3 pr" style="padding:7px 12px;font-size:12px;">Simpan</button>
+    `;
+    const sel=row.querySelector('select');
+    const btn=row.querySelector('button');
+    btn.onclick=async()=>{
+      btn.disabled=true;btn.textContent='...';
+      const newRole=sel.value;
+      try{
+        // Delete existing role(s) for that user, then insert new one (if any)
+        const del=await sb.from('user_roles').delete().eq('user_id',p.id);
+        if(del.error)throw del.error;
+        if(newRole){
+          const ins=await sb.from('user_roles').insert({user_id:p.id,role:newRole});
+          if(ins.error)throw ins.error;
+        }
+        btn.textContent='✓ Tersimpan';
+        setTimeout(()=>{btn.textContent='Simpan';btn.disabled=false;},1200);
+      }catch(e){
+        alert('Gagal menyimpan role: '+e.message);
+        btn.textContent='Simpan';btn.disabled=false;
+      }
+    };
+    list.appendChild(row);
+  });
+  if(!(profiles||[]).length){list.innerHTML='<div style="padding:14px;color:#64748b;font-size:13px;">Belum ada pengguna terdaftar.</div>';}
 }
 
 let cur=null,tool='select',typ='komersial';
@@ -787,22 +857,35 @@ async function bootstrap(){
   const {data:{user}}=await sb.auth.getUser();
   if(!user){gotoAuth();return;}
   CURRENT_USER=user;
-  // Detect admin via user_roles
+  // Detect role via user_roles
   const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',user.id);
-  IS_ADMIN=Array.isArray(roles)&&roles.some(r=>r.role==='admin');
+  const myRoles=Array.isArray(roles)?roles.map(r=>r.role):[];
+  IS_ADMIN=myRoles.includes('admin');
+  IS_EDITOR=myRoles.includes('editor');
+  IS_WRITER=IS_ADMIN||IS_EDITOR;
+  MY_ROLE=IS_ADMIN?'admin':(IS_EDITOR?'editor':(myRoles.includes('viewer')?'viewer':''));
   const chip=document.getElementById('userChip');
-  if(chip){chip.style.display='flex';document.getElementById('userEmail').textContent=user.email||'';const rb=document.getElementById('userRole');rb.textContent=IS_ADMIN?'admin':'viewer';rb.className='rb '+(IS_ADMIN?'admin':'viewer');}
+  if(chip){
+    chip.style.display='flex';
+    document.getElementById('userEmail').textContent=user.email||'';
+    const rb=document.getElementById('userRole');
+    const lbl=MY_ROLE||'menunggu';
+    rb.textContent=lbl;
+    rb.className='rb '+(MY_ROLE||'viewer');
+  }
+  const adminBtn=document.getElementById('adminBtn');
+  if(adminBtn && IS_ADMIN) adminBtn.style.display='inline-flex';
   // Load shared data
   const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
   if(error){console.error(error);}
   if(row && Array.isArray(row.data) && row.data.length){stations=row.data;}
   else{
     stations=JSON.parse(JSON.stringify(DEFAULT_STATIONS));
-    if(IS_ADMIN){
+    if(IS_WRITER){
       try{ await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:user.id}); }catch(_){}
     }
   }
-  if(!IS_ADMIN){showReadOnly();}
+  if(!IS_WRITER){showReadOnly();}
   buildNav();buildDash();
   setTimeout(()=>{const f=document.querySelector('.ghd');if(f){f.classList.add('open');f.nextElementSibling.classList.add('open');}},60);
   // Listen for sign-out from other tabs
