@@ -752,7 +752,13 @@ function saveArea(){
   if(selEl)a.type=selEl.dataset.t;
   a.peruntukan=document.getElementById('ap').value;a.luas=parseFloat(document.getElementById('al').value)||0;
   a.lantai=document.getElementById('alt2').value;a.penyewa=document.getElementById('ape').value;
-  a.sewa=parseFloat(document.getElementById('as2').value)||0;a.masaSewa=document.getElementById('ams').value;
+  a.nilaiPokok=parseFloat(document.getElementById('asPokok').value)||0;
+  a.biayaAdmin=parseFloat(document.getElementById('asAdmin').value)||0;
+  a.com=parseFloat(document.getElementById('asCom').value)||0;
+  a.ppn=parseFloat(document.getElementById('asPpn').value)||0;
+  a.sewa=a.nilaiPokok+a.biayaAdmin+a.com+a.ppn;
+  a.masaSewa=document.getElementById('ams').value;
+  a.jangkaWaktu=document.getElementById('ajw').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
   save();closeM('ma');redraw();buildList();showInfo(a);
 }
