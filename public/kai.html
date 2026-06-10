@@ -820,7 +820,15 @@ function saveArea(){
   a.masaSewa=document.getElementById('ams').value;
   a.jangkaWaktu=document.getElementById('ajw').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
+  if(_pendingFoto==='__REMOVE__')delete a.foto;
+  else if(_pendingFoto)a.foto=_pendingFoto;
+  _pendingFoto=null;
   save();closeM('ma');redraw();buildList();showInfo(a);
+}
+function parseTahun(s){
+  if(!s)return 0;
+  const m=String(s).match(/(\d+(?:[.,]\d+)?)/);
+  return m?parseFloat(m[1].replace(',','.')):0;
 }
 function delArea(){
   if(!editId||!cur||!confirm('Hapus area ini?'))return;
