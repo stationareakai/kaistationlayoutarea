@@ -375,6 +375,16 @@
         </div>
         <div class="fg"><label class="fl">Catatan</label><textarea class="fta" id="ac" placeholder="Keterangan tambahan..."></textarea></div>
       </div>
+      <div class="div2"></div>
+      <div class="fg">
+        <label class="fl">Foto Lokasi Area</label>
+        <div id="fotoPrevWrap" style="display:none;margin-bottom:8px;position:relative;">
+          <img id="fotoPrev" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid var(--kbd2);display:block;cursor:pointer;" onclick="if(this.src)window.open(this.src,'_blank')">
+          <button type="button" class="xbtn" style="position:absolute;top:6px;right:6px;background:#fff;border:1px solid #fca5a5;color:#b91c1c;" onclick="removeFoto()">✕</button>
+        </div>
+        <input type="file" id="fotoInp" accept="image/*" onchange="onFotoPick(this)" style="font-size:12px;">
+        <div style="font-size:10px;color:var(--kt3);margin-top:4px;">Foto akan dikompres otomatis. Maks 8 MB.</div>
+      </div>
     </div>
     <div class="mft">
       <button class="mb3" onclick="closeM('ma')">Batal</button>
@@ -729,7 +739,7 @@ function setType(k){
 
 // openAM — set selected class sesuai warna tipe
 function openAM(a){
-  editId=a.id;
+  editId=a.id;_pendingFoto=null;
   document.getElementById('an').value=a.nama||'';document.getElementById('ap').value=a.peruntukan||'';
   document.getElementById('al').value=a.luas||'';document.getElementById('alt2').value=a.lantai||'';
   document.getElementById('ape').value=a.penyewa||'';
@@ -748,8 +758,39 @@ function openAM(a){
   const selCls={komersial:'sel-k',pelayanan:'sel-p',operasional:'sel-o'}[a.type];
   document.querySelector(`.to2[data-t="${a.type}"]`)?.classList.add(selCls);
   document.getElementById('kf').style.display=a.type==='komersial'?'':'none';
+  // foto preview
+  const fw=document.getElementById('fotoPrevWrap'),fp=document.getElementById('fotoPrev');
+  document.getElementById('fotoInp').value='';
+  if(a.foto){fp.src=a.foto;fw.style.display='';}else{fp.src='';fw.style.display='none';}
   document.getElementById('mtit').textContent=a.nama?'Edit: '+a.nama:'Area #'+(a.num||'?');
   document.getElementById('ma').classList.add('open');
+}
+let _pendingFoto=null;
+function onFotoPick(inp){
+  const f=inp.files[0];if(!f)return;
+  if(f.size>8*1024*1024){alert('File terlalu besar! Maks 8 MB.');inp.value='';return;}
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1280;let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){const s=Math.min(MAX/w,MAX/h);w=Math.round(w*s);h=Math.round(h*s);}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=cv.toDataURL('image/jpeg',0.82);
+      _pendingFoto=dataUrl;
+      document.getElementById('fotoPrev').src=dataUrl;
+      document.getElementById('fotoPrevWrap').style.display='';
+    };
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+function removeFoto(){
+  _pendingFoto='__REMOVE__';
+  document.getElementById('fotoPrev').src='';
+  document.getElementById('fotoPrevWrap').style.display='none';
+  document.getElementById('fotoInp').value='';
 }
 function pickT(el,t){
   document.querySelectorAll('.to2').forEach(e=>e.classList.remove('sel-k','sel-p','sel-o'));
@@ -779,7 +820,15 @@ function saveArea(){
   a.masaSewa=document.getElementById('ams').value;
   a.jangkaWaktu=document.getElementById('ajw').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
+  if(_pendingFoto==='__REMOVE__')delete a.foto;
+  else if(_pendingFoto)a.foto=_pendingFoto;
+  _pendingFoto=null;
   save();closeM('ma');redraw();buildList();showInfo(a);
+}
+function parseTahun(s){
+  if(!s)return 0;
+  const m=String(s).match(/(\d+(?:[.,]\d+)?)/);
+  return m?parseFloat(m[1].replace(',','.')):0;
 }
 function delArea(){
   if(!editId||!cur||!confirm('Hapus area ini?'))return;
@@ -796,8 +845,13 @@ function showInfo(a){
     <div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
     <div class="ipr"><div class="ipl">Luas</div><div class="ipv big">${a.luas||'—'} <span style="font-size:11px;color:var(--kt3);">m²</span></div></div>
     <div class="ipr"><div class="ipl">Lantai</div><div class="ipv">${a.lantai||'—'}</div></div>`;
+  if(a.foto){
+    h+=`<div class="ipd"></div><div style="margin:4px 0 8px;"><div class="ipl" style="margin-bottom:4px;">Foto Lokasi</div><img src="${a.foto}" onclick="window.open('${a.foto}','_blank')" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid var(--kbd2);cursor:pointer;display:block;"></div>`;
+  }
   if(a.type==='komersial'){
     const sc2=a.status||'aktif';const scls={aktif:'st-a',kosong:'st-k',proses:'st-p',expired:'st-e'}[sc2]||'st-e';
+    const th=parseTahun(a.jangkaWaktu);
+    const perTh=th>0&&a.sewa?Math.round(a.sewa/th):0;
     h+=`<div class="ipd"></div>
       <div class="ipr"><div class="ipl">Penyewa</div><div class="ipv" style="font-weight:500;">${a.penyewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Pokok</div><div class="ipv">Rp ${a.nilaiPokok?a.nilaiPokok.toLocaleString('id-ID'):'—'}</div></div>
@@ -807,6 +861,7 @@ function showInfo(a){
       <div class="ipr"><div class="ipl">Total Nilai Sewa</div><div class="ipv org" style="font-weight:700;">Rp ${a.sewa?a.sewa.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Masa Sewa</div><div class="ipv">${a.masaSewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org" style="font-weight:700;">${perTh?'Rp '+perTh.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Status</div><span class="stb ${scls}">${sc2}</span></div>
       ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
   }
