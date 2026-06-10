@@ -116,15 +116,27 @@
 .ug{margin-top:12px;background:var(--kw);border:1px solid var(--kbd);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--kt2);line-height:1.9;}
 .ug ol{padding-left:16px;}
 .la{padding:12px 14px;overflow:auto;flex:1;}
-.lsh{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--kt3);margin:12px 0 6px;display:flex;align-items:center;gap:6px;}
+.lsh{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--kt3);margin:14px 0 6px;display:flex;align-items:center;gap:6px;}
+.lsh:first-child{margin-top:0;}
 .lsh::after{content:'';flex:1;height:1px;background:var(--kbd);}
-.li{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:var(--kw);border:1px solid var(--kbd);border-radius:7px;margin-bottom:4px;cursor:pointer;}
-.li:hover{border-color:var(--kbd2);}.li.sel{border-color:var(--ko);background:var(--kol);}
-.ll{display:flex;align-items:center;gap:8px;}
-.lnum{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
-.lname{font-size:12px;color:var(--kt);font-weight:500;}.lsub{font-size:10px;color:var(--kt3);}
-.xbtn{width:20px;height:20px;border-radius:4px;border:1px solid transparent;background:transparent;cursor:pointer;font-size:11px;color:var(--kt3);display:flex;align-items:center;justify-content:center;}
+.atbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--kw);border:1px solid var(--kbd);border-radius:8px;overflow:hidden;font-size:11px;margin-bottom:6px;}
+.atbl th{background:#f1f5f9;color:var(--kt3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:9.5px;text-align:left;padding:7px 8px;border-bottom:1px solid var(--kbd);white-space:nowrap;}
+.atbl td{padding:7px 8px;border-bottom:1px solid var(--kbd);color:var(--kt);vertical-align:middle;}
+.atbl tr:last-child td{border-bottom:0;}
+.atbl tbody tr{cursor:pointer;}
+.atbl tbody tr:hover{background:#f8fafc;}
+.atbl tbody tr.sel{background:var(--kol);}
+.atbl tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--ko);}
+.atbl .num{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;}
+.atbl .nm{font-weight:600;color:var(--kt);}
+.atbl .mu{color:var(--kt3);font-size:10px;}
+.atbl .rp{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600;color:#14532d;}
+.atbl .py{color:#0f172a;}
+.atbl .ax{text-align:right;white-space:nowrap;}
+.xbtn{width:22px;height:22px;border-radius:5px;border:1px solid transparent;background:transparent;cursor:pointer;font-size:11px;color:var(--kt3);display:inline-flex;align-items:center;justify-content:center;}
 .xbtn:hover{border-color:#fca5a5;color:#b91c1c;background:#fee2e2;}
+.ebtn{width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:#fff;cursor:pointer;font-size:11px;color:var(--kt2);display:inline-flex;align-items:center;justify-content:center;margin-right:2px;}
+.ebtn:hover{border-color:var(--ko);color:var(--ko);}
 .ip{width:220px;flex-shrink:0;border-left:1px solid var(--kbd);display:flex;flex-direction:column;overflow:hidden;background:var(--kw);}
 .ip.hidden{display:none;}
 .iph{padding:12px;border-bottom:1px solid var(--kbd);}
@@ -808,24 +820,42 @@ function buildList(){
   const areas=cur.areas;
   if(!areas.length){document.getElementById('lcont').innerHTML='<div style="text-align:center;padding:32px;font-size:12px;color:var(--kt3);">Belum ada area. Gunakan tab Denah untuk menggambar.</div>';return;}
   const g={komersial:[],pelayanan:[],operasional:[]};areas.forEach(a=>{if(g[a.type])g[a.type].push(a);});
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const rp=n=>n?'Rp '+Number(n).toLocaleString('id-ID'):'<span class="mu">—</span>';
+  const lbl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'};
   let h='';
   ['komersial','pelayanan','operasional'].forEach(type=>{
     if(!g[type].length)return;
-    const c=TC[type];const lbl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[type];
-    h+=`<div class="lsh">${lbl} (${g[type].length})</div>`;
+    const c=TC[type];
+    h+=`<div class="lsh">${lbl[type]} (${g[type].length})</div>`;
+    const isK=type==='komersial';
+    h+=`<table class="atbl"><thead><tr>
+      <th style="width:34px;">No</th>
+      <th>Nama Area</th>
+      <th>Peruntukan</th>
+      <th style="text-align:right;">Luas</th>
+      <th>Lantai</th>`
+      +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
+      +`<th class="ax">Aksi</th></tr></thead><tbody>`;
     g[type].sort((a,b)=>(a.num||999)-(b.num||999)).forEach(a=>{
       const shp=a.shape==='poly'?'⬡':'▭';
-      h+=`<div class="li ${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
-        <div class="ll">
-          <div class="lnum" style="background:${c.fill};color:${c.numBg};border:1.5px solid ${c.stroke};">${a.num||'?'}</div>
-          <div><div class="lname">${shp} ${a.nama||'(Tanpa nama)'}</div><div class="lsub">${a.peruntukan||''}${a.luas?' • '+a.luas+' m²':''}</div></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:5px;">
-          ${type==='komersial'&&a.penyewa?`<span style="font-size:10px;color:var(--c-green);max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.penyewa}</span>`:''}
-          <button class="xbtn" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
-        </div>
-      </div>`;
+      h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
+        <td><span class="num" style="background:${c.fill};color:${c.numBg};border:1.5px solid ${c.stroke};">${a.num||'?'}</span></td>
+        <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
+        <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
+        <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
+        <td>${esc(a.lantai)||'<span class="mu">—</span>'}</td>`
+        +(isK?`<td class="py">${esc(a.penyewa)||'<span class="mu">—</span>'}</td>
+          <td style="text-align:right;" class="rp">${rp(a.sewa)}</td>
+          <td>${esc(a.jangkaWaktu)||'<span class="mu">—</span>'}</td>
+          <td>${esc(a.masaSewa)||'<span class="mu">—</span>'}</td>`:'')
+        +`<td class="ax">
+          <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
+          <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
+        </td>
+      </tr>`;
     });
+    h+=`</tbody></table>`;
   });
   document.getElementById('lcont').innerHTML=h;
 }
