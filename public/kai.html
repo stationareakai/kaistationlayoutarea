@@ -659,10 +659,6 @@ function drawPolyS(oc,pts,c,sel){
   oc.fillStyle=c.fill;oc.fill();oc.strokeStyle=sel?'#002060':c.stroke;oc.lineWidth=sel?2.5:1.5;oc.stroke();
 }
 function drawLbl(oc,a,c,cen,pts,sz){
-  const nr=10;let nx,ny;
-  if(pts){const bb=polyBB(pts);nx=bb.x+nr+3;ny=bb.y+nr+3;}else{nx=a.x+nr+3;ny=a.y+nr+3;}
-  oc.fillStyle=c.numBg;oc.beginPath();oc.arc(nx,ny,nr,0,Math.PI*2);oc.fill();
-  oc.fillStyle=c.numTxt;oc.font='bold 8px Plus Jakarta Sans, system-ui, sans-serif';oc.textAlign='center';oc.textBaseline='middle';oc.fillText(String(a.num||'?'),nx,ny);
   if(a.nama&&cen){
     const fs=9;oc.font=`bold ${fs}px Plus Jakarta Sans, system-ui, sans-serif`;
     const tw=oc.measureText(a.nama).width,pw=tw+8,ph=fs+5;
