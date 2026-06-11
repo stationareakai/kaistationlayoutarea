@@ -34,6 +34,7 @@
   .ro-banner{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;z-index:1000;box-shadow:0 8px 24px -8px rgba(0,0,0,.3);}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -322,6 +323,9 @@
       </div>
 
       <div id="pl" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+        <div style="padding:8px 10px;border-bottom:1px solid var(--kbd);display:flex;justify-content:flex-end;gap:6px;background:var(--kw);">
+          <button class="tbtn" onclick="exportExcel()" style="font-size:11px;">⬇ Download Excel</button>
+        </div>
         <div class="la" id="lcont"></div>
       </div>
     </div>
@@ -916,6 +920,39 @@ function buildList(){
 }
 function hlArea(id){selId=id;const a=cur.areas.find(x=>x.id===id);if(a){buildList();showInfo(a);switchTab('denah',document.getElementById('tab-d'));}}
 function qdel(id){if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
+function exportExcel(){
+  if(typeof XLSX==='undefined'){alert('Library Excel belum siap, coba lagi sebentar.');return;}
+  if(!cur||!cur.areas||!cur.areas.length){alert('Belum ada area untuk diekspor.');return;}
+  const lbl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'};
+  const wb=XLSX.utils.book_new();
+  ['komersial','pelayanan','operasional'].forEach(type=>{
+    const arr=cur.areas.filter(a=>a.type===type).sort((a,b)=>(a.num||999)-(b.num||999));
+    if(!arr.length)return;
+    const isK=type==='komersial';
+    const rows=arr.map(a=>{
+      const th=(function(s){const m=String(s||'').match(/\d+(?:[.,]\d+)?/);return m?parseFloat(m[0].replace(',','.')):0;})(a.jangkaWaktu);
+      const sewa=Number(a.sewa)||0;
+      const base={'No':a.num||'','Nama Area':a.nama||'','Peruntukan':a.peruntukan||'','Luas (m²)':a.luas||'','Lantai':a.lantai||''};
+      if(!isK)return base;
+      return {...base,
+        'Penyewa':a.penyewa||'',
+        'Nilai Pokok':Number(a.nilaiPokok)||0,
+        'Biaya Administrasi':Number(a.biayaAdmin)||0,
+        'COM':Number(a.com)||0,
+        'PPN':Number(a.ppn)||0,
+        'Total Nilai Sewa':sewa,
+        'Jangka Waktu':a.jangkaWaktu||'',
+        'Nilai Sewa / Tahun':th?Math.round(sewa/th):'',
+        'Masa Sewa':a.masaSewa||''
+      };
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb,ws,lbl[type]);
+  });
+  const nm=(cur.nama||cur.name||'denah').replace(/[^a-zA-Z0-9_-]+/g,'_');
+  const d=new Date(),pad=n=>String(n).padStart(2,'0');
+  XLSX.writeFile(wb,`DaftarArea_${nm}_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.xlsx`);
+}
 
 function doUpload(inp){
   const f=inp.files[0];if(!f||!cur)return;
