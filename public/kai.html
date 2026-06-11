@@ -852,7 +852,7 @@ function showInfo(a){
     const sc2=a.status||'aktif';const scls={aktif:'st-a',kosong:'st-k',proses:'st-p',expired:'st-e'}[sc2]||'st-e';
     const th=parseTahun(a.jangkaWaktu);
     const perTh=th>0&&a.sewa?Math.round(a.sewa/th):0;
-    const perM2Bulan=th>0&&a.nilaiPokok?Math.round(a.nilaiPokok/th/12):0;
+    const perM2Bulan=th>0&&a.nilaiPokok&&a.luas?Math.round(a.nilaiPokok/a.luas/th/12):0;
     h+=`<div class="ipd"></div>
       <div class="ipr"><div class="ipl">Penyewa</div><div class="ipv" style="font-weight:500;">${a.penyewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Pokok</div><div class="ipv">Rp ${a.nilaiPokok?a.nilaiPokok.toLocaleString('id-ID'):'—'}</div></div>
