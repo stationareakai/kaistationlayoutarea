@@ -856,6 +856,7 @@ function showInfo(a){
     const sc2=a.status||'aktif';const scls={aktif:'st-a',kosong:'st-k',proses:'st-p',expired:'st-e'}[sc2]||'st-e';
     const th=parseTahun(a.jangkaWaktu);
     const perTh=th>0&&a.sewa?Math.round(a.sewa/th):0;
+    const perM2Bulan=th>0&&a.nilaiPokok?Math.round(a.nilaiPokok/th/12):0;
     h+=`<div class="ipd"></div>
       <div class="ipr"><div class="ipl">Penyewa</div><div class="ipv" style="font-weight:500;">${a.penyewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Pokok</div><div class="ipv">Rp ${a.nilaiPokok?a.nilaiPokok.toLocaleString('id-ID'):'—'}</div></div>
@@ -866,6 +867,7 @@ function showInfo(a){
       <div class="ipr"><div class="ipl">Masa Sewa</div><div class="ipv">${a.masaSewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org" style="font-weight:700;">${perTh?'Rp '+perTh.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Nilai Sewa / m² / Bulan</div><div class="ipv org" style="font-weight:700;">${perM2Bulan?'Rp '+perM2Bulan.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Status</div><span class="stb ${scls}">${sc2}</span></div>
       ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
   }
