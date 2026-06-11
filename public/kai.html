@@ -941,7 +941,7 @@ function exportExcel(){
         'Total Nilai Sewa':sewa,
         'Jangka Waktu':a.jangkaWaktu||'',
         'Nilai Sewa / Tahun':th?Math.round(sewa/th):'',
-        'Nilai Sewa / m² / Bulan':th?Math.round((Number(a.nilaiPokok)||0)/th/12):'',
+        'Nilai Sewa / m² / Bulan':th&&a.luas?Math.round((Number(a.nilaiPokok)||0)/Number(a.luas)/th/12):'',
         'Masa Sewa':a.masaSewa||''
       };
     });
