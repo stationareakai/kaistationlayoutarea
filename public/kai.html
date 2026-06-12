@@ -904,7 +904,7 @@ function buildList(){
       +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
       +`<th class="ax">Aksi</th></tr></thead><tbody>`;
     g[type].forEach(a=>{
-      const shp=a.shape==='poly'?'⬡':'▭';
+      const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
       h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
         <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
         <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
