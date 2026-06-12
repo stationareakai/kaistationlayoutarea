@@ -267,9 +267,6 @@
             <button class="tbtn" id="bpl" onclick="setType('p')"><div class="cdot" style="background:#1a6fd8;"></div>Pelayanan</button>
             <button class="tbtn" id="bo" onclick="setType('o')"><div class="cdot" style="background:#e8650a;"></div>Operasional</button>
             <div class="tsep"></div>
-            <span style="font-size:10px;color:var(--kt3);">No:</span>
-            <input class="ni" type="number" id="nn" min="1" value="1">
-            <div class="tsep"></div>
             <button class="tbtn dl" onclick="downloadDenah()">⬇ Download</button>
           </div>
           <div class="toolbar-row2">
@@ -699,9 +696,8 @@ function mup(e){
     drawing=false;const{x,y}=getCanvasPos(e);
     const rx=Math.min(sx,x),ry=Math.min(sy,y),rw=Math.abs(x-sx),rh=Math.abs(y-sy);
     if(rw<10||rh<10){redraw();return;}
-    const num=parseInt(document.getElementById('nn').value)||1;
-    const a={id:'a'+Date.now(),num,type:typ,shape:'rect',x:rx,y:ry,w:rw,h:rh,nama:'',peruntukan:'',luas:Math.round(rw*rh/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
-    cur.areas.push(a);save();document.getElementById('nn').value=num+1;selId=a.id;redraw();openAM(a);
+    const a={id:'a'+Date.now(),type:typ,shape:'rect',x:rx,y:ry,w:rw,h:rh,nama:'',peruntukan:'',luas:Math.round(rw*rh/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+    cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
   }
 }
 function mdbl(e){
@@ -711,10 +707,9 @@ function mdbl(e){
 function closePoly(){
   polyDrawing=false;document.getElementById('poly-hint').classList.remove('show');
   if(polyPts.length<3){polyPts=[];redraw();return;}
-  const num=parseInt(document.getElementById('nn').value)||1;
   const bb=polyBB(polyPts);
-  const a={id:'a'+Date.now(),num,type:typ,shape:'poly',points:[...polyPts],x:bb.x,y:bb.y,w:bb.w,h:bb.h,nama:'',peruntukan:'',luas:Math.round(polyA2(polyPts)/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
-  polyPts=[];cur.areas.push(a);save();document.getElementById('nn').value=num+1;selId=a.id;redraw();openAM(a);
+  const a={id:'a'+Date.now(),type:typ,shape:'poly',points:[...polyPts],x:bb.x,y:bb.y,w:bb.w,h:bb.h,nama:'',peruntukan:'',luas:Math.round(polyA2(polyPts)/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+  polyPts=[];cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
 }
 function cancelPoly(){polyDrawing=false;polyPts=[];document.getElementById('poly-hint').classList.remove('show');redraw();}
 function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
