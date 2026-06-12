@@ -736,10 +736,10 @@ function resetZoom(){scale=1;document.getElementById('zlbl').textContent='100%';
 
 function setTool(t){
   if(tool==='poly'&&polyDrawing)cancelPoly();tool=t;
-  ['bs','br','bpo'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('ma');});
-  const map={select:'bs',rect:'br',poly:'bpo'};if(map[t])document.getElementById(map[t]).classList.add('ma');
-  document.getElementById('cwrap').className='cwrap'+(t==='select'?' sel':t==='poly'?' poly':'');
-  document.getElementById('mhint').textContent={select:'Mode: Pilih/Klik',rect:'Mode: Gambar Kotak',poly:'Mode: Titik-Titik (Polygon)'}[t];
+  ['bs','br','bpo','bpt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('ma');});
+  const map={select:'bs',rect:'br',poly:'bpo',point:'bpt'};if(map[t])document.getElementById(map[t]).classList.add('ma');
+  document.getElementById('cwrap').className='cwrap'+(t==='select'?' sel':(t==='poly'||t==='point')?' poly':'');
+  document.getElementById('mhint').textContent={select:'Mode: Pilih/Klik',rect:'Mode: Gambar Kotak',poly:'Mode: Polygon',point:'Mode: Titik'}[t];
   document.getElementById('tip-box').innerHTML=TIPS[t];
 }
 function setType(k){
