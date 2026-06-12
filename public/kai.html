@@ -640,11 +640,16 @@ function redraw(){
 function drawGrid(){ctx.strokeStyle='rgba(0,63,143,0.08)';ctx.lineWidth=1;for(let x=0;x<cvs.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cvs.height);ctx.stroke();}for(let y=0;y<cvs.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cvs.width,y);ctx.stroke();}}
 function scaleA(a,s){
   if(a.shape==='poly'&&a.points)return{...a,points:a.points.map(p=>({x:p.x*s,y:p.y*s})),x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
+  if(a.shape==='point')return{...a,x:a.x*s,y:a.y*s,w:0,h:0};
   return{...a,x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
 }
+const POINT_R=14;
 function drawAreaD(a,sel){
   const c=TC[a.type]||TC.komersial;
-  if(a.shape==='poly'&&a.points&&a.points.length>2){
+  if(a.shape==='point'){
+    drawPointS(ctx,a.x,a.y,c,sel);
+    drawLbl(ctx,a,c,{x:a.x,y:a.y+POINT_R+8},null);
+  } else if(a.shape==='poly'&&a.points&&a.points.length>2){
     drawPolyS(ctx,a.points,c,sel);
     drawLbl(ctx,a,c,polyCen(a.points),a.points);
   } else {
@@ -652,6 +657,11 @@ function drawAreaD(a,sel){
     ctx.strokeStyle=sel?'#002060':c.stroke;ctx.lineWidth=sel?2.5:1.5;ctx.strokeRect(a.x,a.y,a.w,a.h);
     drawLbl(ctx,a,c,{x:a.x+a.w/2,y:a.y+a.h/2},null,{w:a.w,h:a.h});
   }
+}
+function drawPointS(oc,x,y,c,sel){
+  oc.beginPath();oc.arc(x,y,POINT_R,0,Math.PI*2);
+  oc.fillStyle=c.stroke;oc.fill();
+  oc.strokeStyle=sel?'#002060':'#fff';oc.lineWidth=sel?3:2;oc.stroke();
 }
 function drawPolyS(oc,pts,c,sel){
   oc.beginPath();oc.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>oc.lineTo(p.x,p.y));oc.closePath();
