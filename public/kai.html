@@ -916,13 +916,13 @@ function exportExcel(){
   const lbl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'};
   const wb=XLSX.utils.book_new();
   ['komersial','pelayanan','operasional'].forEach(type=>{
-    const arr=cur.areas.filter(a=>a.type===type).sort((a,b)=>(a.num||999)-(b.num||999));
+    const arr=cur.areas.filter(a=>a.type===type);
     if(!arr.length)return;
     const isK=type==='komersial';
     const rows=arr.map(a=>{
       const th=(function(s){const m=String(s||'').match(/\d+(?:[.,]\d+)?/);return m?parseFloat(m[0].replace(',','.')):0;})(a.jangkaWaktu);
       const sewa=Number(a.sewa)||0;
-      const base={'No':a.num||'','Nama Area':a.nama||'','Peruntukan':a.peruntukan||'','Luas (m²)':a.luas||'','Lantai':a.lantai||''};
+      const base={'Nama Area':a.nama||'','Peruntukan':a.peruntukan||'','Luas (m²)':a.luas||'','Lantai':a.lantai||''};
       if(!isK)return base;
       return {...base,
         'Penyewa':a.penyewa||'',
