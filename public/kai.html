@@ -757,7 +757,7 @@ function openAM(a){
   const fw=document.getElementById('fotoPrevWrap'),fp=document.getElementById('fotoPrev');
   document.getElementById('fotoInp').value='';
   if(a.foto){fp.src=a.foto;fw.style.display='';}else{fp.src='';fw.style.display='none';}
-  document.getElementById('mtit').textContent=a.nama?'Edit: '+a.nama:'Area #'+(a.num||'?');
+  document.getElementById('mtit').textContent=a.nama?'Edit: '+a.nama:'Area Baru';
   document.getElementById('ma').classList.add('open');
 }
 let _pendingFoto=null;
@@ -881,17 +881,15 @@ function buildList(){
     h+=`<div class="lsh">${lbl[type]} (${g[type].length})</div>`;
     const isK=type==='komersial';
     h+=`<table class="atbl"><thead><tr>
-      <th style="width:34px;">No</th>
       <th>Nama Area</th>
       <th>Peruntukan</th>
       <th style="text-align:right;">Luas</th>
       <th>Lantai</th>`
       +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
       +`<th class="ax">Aksi</th></tr></thead><tbody>`;
-    g[type].sort((a,b)=>(a.num||999)-(b.num||999)).forEach(a=>{
+    g[type].forEach(a=>{
       const shp=a.shape==='poly'?'⬡':'▭';
       h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
-        <td><span class="num" style="background:${c.fill};color:${c.numBg};border:1.5px solid ${c.stroke};">${a.num||'?'}</span></td>
         <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
         <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
         <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
