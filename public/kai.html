@@ -267,9 +267,6 @@
             <button class="tbtn" id="bpl" onclick="setType('p')"><div class="cdot" style="background:#1a6fd8;"></div>Pelayanan</button>
             <button class="tbtn" id="bo" onclick="setType('o')"><div class="cdot" style="background:#e8650a;"></div>Operasional</button>
             <div class="tsep"></div>
-            <span style="font-size:10px;color:var(--kt3);">No:</span>
-            <input class="ni" type="number" id="nn" min="1" value="1">
-            <div class="tsep"></div>
             <button class="tbtn dl" onclick="downloadDenah()">⬇ Download</button>
           </div>
           <div class="toolbar-row2">
@@ -699,9 +696,8 @@ function mup(e){
     drawing=false;const{x,y}=getCanvasPos(e);
     const rx=Math.min(sx,x),ry=Math.min(sy,y),rw=Math.abs(x-sx),rh=Math.abs(y-sy);
     if(rw<10||rh<10){redraw();return;}
-    const num=parseInt(document.getElementById('nn').value)||1;
-    const a={id:'a'+Date.now(),num,type:typ,shape:'rect',x:rx,y:ry,w:rw,h:rh,nama:'',peruntukan:'',luas:Math.round(rw*rh/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
-    cur.areas.push(a);save();document.getElementById('nn').value=num+1;selId=a.id;redraw();openAM(a);
+    const a={id:'a'+Date.now(),type:typ,shape:'rect',x:rx,y:ry,w:rw,h:rh,nama:'',peruntukan:'',luas:Math.round(rw*rh/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+    cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
   }
 }
 function mdbl(e){
@@ -711,10 +707,9 @@ function mdbl(e){
 function closePoly(){
   polyDrawing=false;document.getElementById('poly-hint').classList.remove('show');
   if(polyPts.length<3){polyPts=[];redraw();return;}
-  const num=parseInt(document.getElementById('nn').value)||1;
   const bb=polyBB(polyPts);
-  const a={id:'a'+Date.now(),num,type:typ,shape:'poly',points:[...polyPts],x:bb.x,y:bb.y,w:bb.w,h:bb.h,nama:'',peruntukan:'',luas:Math.round(polyA2(polyPts)/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
-  polyPts=[];cur.areas.push(a);save();document.getElementById('nn').value=num+1;selId=a.id;redraw();openAM(a);
+  const a={id:'a'+Date.now(),type:typ,shape:'poly',points:[...polyPts],x:bb.x,y:bb.y,w:bb.w,h:bb.h,nama:'',peruntukan:'',luas:Math.round(polyA2(polyPts)/100),lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+  polyPts=[];cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
 }
 function cancelPoly(){polyDrawing=false;polyPts=[];document.getElementById('poly-hint').classList.remove('show');redraw();}
 function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
@@ -762,7 +757,7 @@ function openAM(a){
   const fw=document.getElementById('fotoPrevWrap'),fp=document.getElementById('fotoPrev');
   document.getElementById('fotoInp').value='';
   if(a.foto){fp.src=a.foto;fw.style.display='';}else{fp.src='';fw.style.display='none';}
-  document.getElementById('mtit').textContent=a.nama?'Edit: '+a.nama:'Area #'+(a.num||'?');
+  document.getElementById('mtit').textContent=a.nama?'Edit: '+a.nama:'Area Baru';
   document.getElementById('ma').classList.add('open');
 }
 let _pendingFoto=null;
@@ -839,10 +834,9 @@ function showInfo(a){
   const tl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[a.type];
   const cls={komersial:'tg-k',pelayanan:'tg-p',operasional:'tg-o'}[a.type];
   const shp=a.shape==='poly'?'⬡ Polygon':'▭ Kotak';
-  document.getElementById('ipn').textContent=a.nama||(a.num?'Area #'+a.num:'Tanpa nama');
+  document.getElementById('ipn').textContent=a.nama||'Tanpa nama';
   document.getElementById('ipbw').innerHTML=`<span class="tbg ${cls}">${tl}</span> <span style="font-size:10px;color:var(--kt3);margin-left:4px;">${shp}</span>`;
-  let h=`<div class="ipr"><div class="ipl">No. Area</div><div class="ipv big">${a.num||'—'}</div></div>
-    <div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
+  let h=`<div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
     <div class="ipr"><div class="ipl">Luas</div><div class="ipv big">${a.luas||'—'} <span style="font-size:11px;color:var(--kt3);">m²</span></div></div>
     <div class="ipr"><div class="ipl">Lantai</div><div class="ipv">${a.lantai||'—'}</div></div>`;
   if(a.foto){
@@ -887,17 +881,15 @@ function buildList(){
     h+=`<div class="lsh">${lbl[type]} (${g[type].length})</div>`;
     const isK=type==='komersial';
     h+=`<table class="atbl"><thead><tr>
-      <th style="width:34px;">No</th>
       <th>Nama Area</th>
       <th>Peruntukan</th>
       <th style="text-align:right;">Luas</th>
       <th>Lantai</th>`
       +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
       +`<th class="ax">Aksi</th></tr></thead><tbody>`;
-    g[type].sort((a,b)=>(a.num||999)-(b.num||999)).forEach(a=>{
+    g[type].forEach(a=>{
       const shp=a.shape==='poly'?'⬡':'▭';
       h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
-        <td><span class="num" style="background:${c.fill};color:${c.numBg};border:1.5px solid ${c.stroke};">${a.num||'?'}</span></td>
         <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
         <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
         <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
@@ -924,13 +916,13 @@ function exportExcel(){
   const lbl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'};
   const wb=XLSX.utils.book_new();
   ['komersial','pelayanan','operasional'].forEach(type=>{
-    const arr=cur.areas.filter(a=>a.type===type).sort((a,b)=>(a.num||999)-(b.num||999));
+    const arr=cur.areas.filter(a=>a.type===type);
     if(!arr.length)return;
     const isK=type==='komersial';
     const rows=arr.map(a=>{
       const th=(function(s){const m=String(s||'').match(/\d+(?:[.,]\d+)?/);return m?parseFloat(m[0].replace(',','.')):0;})(a.jangkaWaktu);
       const sewa=Number(a.sewa)||0;
-      const base={'No':a.num||'','Nama Area':a.nama||'','Peruntukan':a.peruntukan||'','Luas (m²)':a.luas||'','Lantai':a.lantai||''};
+      const base={'Nama Area':a.nama||'','Peruntukan':a.peruntukan||'','Luas (m²)':a.luas||'','Lantai':a.lantai||''};
       if(!isK)return base;
       return {...base,
         'Penyewa':a.penyewa||'',
