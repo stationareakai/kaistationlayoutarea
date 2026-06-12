@@ -260,7 +260,8 @@
             <span style="font-size:10px;color:var(--kt3);font-weight:500;">MODE:</span>
             <button class="tbtn" id="bs" onclick="setTool('select')">↖ Pilih/Klik</button>
             <button class="tbtn" id="br" onclick="setTool('rect')">▭ Kotak</button>
-            <button class="tbtn" id="bpo" onclick="setTool('poly')">⬡ Titik-Titik</button>
+            <button class="tbtn" id="bpo" onclick="setTool('poly')">⬡ Polygon</button>
+            <button class="tbtn" id="bpt" onclick="setTool('point')">● Titik</button>
             <div class="tsep"></div>
             <span style="font-size:10px;color:var(--kt3);">Tipe:</span>
             <button class="tbtn on-k" id="bk" onclick="setType('k')"><div class="cdot" style="background:#16a34a;"></div>Komersial</button>
@@ -305,7 +306,7 @@
             <ol>
               <li>Upload gambar denah stasiun (PNG/JPG)</li>
               <li>Buka tab <b>Denah</b> — gambar jadi latar belakang</li>
-              <li>Pilih mode <b>Kotak</b> atau <b>Titik-Titik</b></li>
+              <li>Pilih mode <b>Kotak</b>, <b>Polygon</b>, atau <b>Titik</b></li>
               <li>Pilih tipe area lalu gambar di atas denah</li>
               <li>Klik area untuk melihat info, double-click untuk edit</li>
               <li>Untuk hapus area: edit info → tombol Hapus</li>
@@ -547,7 +548,8 @@ const TC={
 const TIPS={
   select:'<b>Pilih/Klik:</b> Klik area untuk lihat info. Double-click untuk edit. Hapus area melalui tombol Hapus di form edit.',
   rect:'<b>Mode Kotak:</b> Klik dan drag pada denah untuk menggambar area persegi panjang.',
-  poly:'<b>Mode Titik-Titik:</b> Klik satu per satu sudut area tidak beraturan. Klik titik pertama untuk menutup. Esc untuk batal.',
+  poly:'<b>Mode Polygon:</b> Klik satu per satu sudut area tidak beraturan. Klik titik pertama untuk menutup. Esc untuk batal.',
+  point:'<b>Mode Titik:</b> Klik pada denah untuk menempatkan titik besar — cocok untuk Vending Machine, ATM, atau Iklan.',
 };
 
 function getCanvasPos(e){
@@ -638,11 +640,16 @@ function redraw(){
 function drawGrid(){ctx.strokeStyle='rgba(0,63,143,0.08)';ctx.lineWidth=1;for(let x=0;x<cvs.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cvs.height);ctx.stroke();}for(let y=0;y<cvs.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cvs.width,y);ctx.stroke();}}
 function scaleA(a,s){
   if(a.shape==='poly'&&a.points)return{...a,points:a.points.map(p=>({x:p.x*s,y:p.y*s})),x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
+  if(a.shape==='point')return{...a,x:a.x*s,y:a.y*s,w:0,h:0};
   return{...a,x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
 }
+const POINT_R=14;
 function drawAreaD(a,sel){
   const c=TC[a.type]||TC.komersial;
-  if(a.shape==='poly'&&a.points&&a.points.length>2){
+  if(a.shape==='point'){
+    drawPointS(ctx,a.x,a.y,c,sel);
+    drawLbl(ctx,a,c,{x:a.x,y:a.y+POINT_R+8},null);
+  } else if(a.shape==='poly'&&a.points&&a.points.length>2){
     drawPolyS(ctx,a.points,c,sel);
     drawLbl(ctx,a,c,polyCen(a.points),a.points);
   } else {
@@ -650,6 +657,11 @@ function drawAreaD(a,sel){
     ctx.strokeStyle=sel?'#002060':c.stroke;ctx.lineWidth=sel?2.5:1.5;ctx.strokeRect(a.x,a.y,a.w,a.h);
     drawLbl(ctx,a,c,{x:a.x+a.w/2,y:a.y+a.h/2},null,{w:a.w,h:a.h});
   }
+}
+function drawPointS(oc,x,y,c,sel){
+  oc.beginPath();oc.arc(x,y,POINT_R,0,Math.PI*2);
+  oc.fillStyle=c.stroke;oc.fill();
+  oc.strokeStyle=sel?'#002060':'#fff';oc.lineWidth=sel?3:2;oc.stroke();
 }
 function drawPolyS(oc,pts,c,sel){
   oc.beginPath();oc.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>oc.lineTo(p.x,p.y));oc.closePath();
@@ -680,6 +692,10 @@ function mdown(e){
   const{x,y}=getCanvasPos(e);
   if(tool==='select'){const h=hitTest(x,y);selId=h?h.id:null;redraw();if(h)showInfo(h);else closeInfo();}
   else if(tool==='rect'){drawing=true;sx=x;sy=y;}
+  else if(tool==='point'){
+    const a={id:'a'+Date.now(),type:typ,shape:'point',x,y,w:0,h:0,nama:'',peruntukan:'',luas:'',lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
+    cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
+  }
   else if(tool==='poly'){
     if(!polyDrawing){polyDrawing=true;polyPts=[];}
     if(polyPts.length>=3){const fp=polyPts[0],dx=x-fp.x,dy=y-fp.y;if(Math.sqrt(dx*dx+dy*dy)<12){closePoly();return;}}
@@ -712,7 +728,7 @@ function closePoly(){
   polyPts=[];cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
 }
 function cancelPoly(){polyDrawing=false;polyPts=[];document.getElementById('poly-hint').classList.remove('show');redraw();}
-function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
+function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='point'){const dx=x-a.x,dy=y-a.y;if(dx*dx+dy*dy<=(POINT_R+2)*(POINT_R+2))return a;}else if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
 function ptInPoly(x,y,pts){let inside=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const xi=pts[i].x,yi=pts[i].y,xj=pts[j].x,yj=pts[j].y;if((yi>y)!=(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)inside=!inside;}return inside;}
 
 function doZoom(d){scale=Math.min(3,Math.max(0.3,+(scale+d).toFixed(2)));document.getElementById('zlbl').textContent=Math.round(scale*100)+'%';if(bgImg&&bgImg.naturalWidth)resizeCvs();redraw();}
@@ -720,10 +736,10 @@ function resetZoom(){scale=1;document.getElementById('zlbl').textContent='100%';
 
 function setTool(t){
   if(tool==='poly'&&polyDrawing)cancelPoly();tool=t;
-  ['bs','br','bpo'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('ma');});
-  const map={select:'bs',rect:'br',poly:'bpo'};if(map[t])document.getElementById(map[t]).classList.add('ma');
-  document.getElementById('cwrap').className='cwrap'+(t==='select'?' sel':t==='poly'?' poly':'');
-  document.getElementById('mhint').textContent={select:'Mode: Pilih/Klik',rect:'Mode: Gambar Kotak',poly:'Mode: Titik-Titik (Polygon)'}[t];
+  ['bs','br','bpo','bpt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('ma');});
+  const map={select:'bs',rect:'br',poly:'bpo',point:'bpt'};if(map[t])document.getElementById(map[t]).classList.add('ma');
+  document.getElementById('cwrap').className='cwrap'+(t==='select'?' sel':(t==='poly'||t==='point')?' poly':'');
+  document.getElementById('mhint').textContent={select:'Mode: Pilih/Klik',rect:'Mode: Gambar Kotak',poly:'Mode: Polygon',point:'Mode: Titik'}[t];
   document.getElementById('tip-box').innerHTML=TIPS[t];
 }
 function setType(k){
@@ -833,7 +849,7 @@ function delArea(){
 function showInfo(a){
   const tl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[a.type];
   const cls={komersial:'tg-k',pelayanan:'tg-p',operasional:'tg-o'}[a.type];
-  const shp=a.shape==='poly'?'⬡ Polygon':'▭ Kotak';
+  const shp=a.shape==='poly'?'⬡ Polygon':a.shape==='point'?'● Titik':'▭ Kotak';
   document.getElementById('ipn').textContent=a.nama||'Tanpa nama';
   document.getElementById('ipbw').innerHTML=`<span class="tbg ${cls}">${tl}</span> <span style="font-size:10px;color:var(--kt3);margin-left:4px;">${shp}</span>`;
   let h=`<div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
@@ -888,7 +904,7 @@ function buildList(){
       +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
       +`<th class="ax">Aksi</th></tr></thead><tbody>`;
     g[type].forEach(a=>{
-      const shp=a.shape==='poly'?'⬡':'▭';
+      const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
       h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
         <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
         <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
@@ -972,7 +988,11 @@ function downloadDenah(){
   else{oc.fillStyle='#ccdff5';oc.fillRect(0,pad,iW,iH);}
   cur.areas.forEach(a=>{
     const c=TC[a.type]||TC.komersial;
-    if(a.shape==='poly'&&a.points){
+    if(a.shape==='point'){
+      const a2={...a,y:a.y+pad};
+      drawPointS(oc,a2.x,a2.y,c,false);
+      drawLbl(oc,a2,c,{x:a2.x,y:a2.y+POINT_R+8},null);
+    } else if(a.shape==='poly'&&a.points){
       const pts=a.points.map(p=>({x:p.x,y:p.y+pad}));
       drawPolyS(oc,pts,c,false);drawLbl(oc,{...a},c,polyCen(pts),pts);
     } else {
