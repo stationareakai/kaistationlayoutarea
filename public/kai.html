@@ -849,7 +849,7 @@ function delArea(){
 function showInfo(a){
   const tl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[a.type];
   const cls={komersial:'tg-k',pelayanan:'tg-p',operasional:'tg-o'}[a.type];
-  const shp=a.shape==='poly'?'⬡ Polygon':'▭ Kotak';
+  const shp=a.shape==='poly'?'⬡ Polygon':a.shape==='point'?'● Titik':'▭ Kotak';
   document.getElementById('ipn').textContent=a.nama||'Tanpa nama';
   document.getElementById('ipbw').innerHTML=`<span class="tbg ${cls}">${tl}</span> <span style="font-size:10px;color:var(--kt3);margin-left:4px;">${shp}</span>`;
   let h=`<div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
