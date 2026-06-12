@@ -834,10 +834,9 @@ function showInfo(a){
   const tl={komersial:'Komersial',pelayanan:'Pelayanan',operasional:'Operasional'}[a.type];
   const cls={komersial:'tg-k',pelayanan:'tg-p',operasional:'tg-o'}[a.type];
   const shp=a.shape==='poly'?'⬡ Polygon':'▭ Kotak';
-  document.getElementById('ipn').textContent=a.nama||(a.num?'Area #'+a.num:'Tanpa nama');
+  document.getElementById('ipn').textContent=a.nama||'Tanpa nama';
   document.getElementById('ipbw').innerHTML=`<span class="tbg ${cls}">${tl}</span> <span style="font-size:10px;color:var(--kt3);margin-left:4px;">${shp}</span>`;
-  let h=`<div class="ipr"><div class="ipl">No. Area</div><div class="ipv big">${a.num||'—'}</div></div>
-    <div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
+  let h=`<div class="ipr"><div class="ipl">Peruntukan</div><div class="ipv">${a.peruntukan||'—'}</div></div>
     <div class="ipr"><div class="ipl">Luas</div><div class="ipv big">${a.luas||'—'} <span style="font-size:11px;color:var(--kt3);">m²</span></div></div>
     <div class="ipr"><div class="ipl">Lantai</div><div class="ipv">${a.lantai||'—'}</div></div>`;
   if(a.foto){
