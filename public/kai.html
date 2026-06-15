@@ -882,6 +882,8 @@ function showInfo(a){
       <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org" style="font-weight:700;">${perTh?'Rp '+perTh.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / m² / Bulan</div><div class="ipv org" style="font-weight:700;">${perM2Bulan?'Rp '+perM2Bulan.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Nomor Perjanjian</div><div class="ipv">${a.nomorPerjanjian||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Tanggal Perjanjian</div><div class="ipv">${a.tglPerjanjian?new Date(a.tglPerjanjian).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—'}</div></div>
       <div class="ipr"><div class="ipl">Status</div><span class="stb ${scls}">${sc2}</span></div>
       ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
   }
