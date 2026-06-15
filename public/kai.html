@@ -373,9 +373,10 @@
           <div class="fg"><label class="fl">Tanggal Perjanjian</label><input class="fi" id="atp" type="date"></div>
         </div>
         <div class="fr">
-          <div class="fg"><label class="fl">Masa Sewa</label><input class="fi" id="ams" placeholder="2023–2026"></div>
-          <div class="fg"><label class="fl">Jangka Waktu</label><input class="fi" id="ajw" placeholder="3 tahun"></div>
+          <div class="fg"><label class="fl">Masa Awal</label><input class="fi" id="ama" type="date"></div>
+          <div class="fg"><label class="fl">Masa Akhir</label><input class="fi" id="amk" type="date"></div>
         </div>
+        <div class="fg"><label class="fl">Jangka Waktu</label><input class="fi" id="ajw" placeholder="3 tahun"></div>
         <div class="fg"><label class="fl">Status Sewa</label>
           <select class="fs" id="ast"><option value="aktif">Aktif</option><option value="kosong">Kosong</option><option value="proses">Dalam Proses</option><option value="expired">Expired</option></select>
         </div>
@@ -765,7 +766,8 @@ function openAM(a){
   document.getElementById('asCom').value=a.com||'';
   document.getElementById('asPpn').value=a.ppn||'';
   calcTotal();
-  document.getElementById('ams').value=a.masaSewa||'';
+  document.getElementById('ama').value=a.masaAwal||'';
+  document.getElementById('amk').value=a.masaAkhir||'';
   document.getElementById('ajw').value=a.jangkaWaktu||'';
   document.getElementById('anp').value=a.nomorPerjanjian||'';
   document.getElementById('atp').value=a.tglPerjanjian||'';
@@ -836,7 +838,8 @@ function saveArea(){
   a.com=parseFloat(document.getElementById('asCom').value)||0;
   a.ppn=parseFloat(document.getElementById('asPpn').value)||0;
   a.sewa=a.nilaiPokok+a.biayaAdmin+a.com+a.ppn;
-  a.masaSewa=document.getElementById('ams').value;
+  a.masaAwal=document.getElementById('ama').value;
+  a.masaAkhir=document.getElementById('amk').value;
   a.jangkaWaktu=document.getElementById('ajw').value;
   a.nomorPerjanjian=document.getElementById('anp').value;
   a.tglPerjanjian=document.getElementById('atp').value;
@@ -880,7 +883,8 @@ function showInfo(a){
       <div class="ipr"><div class="ipl">COM</div><div class="ipv">Rp ${a.com?a.com.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">PPN</div><div class="ipv">Rp ${a.ppn?a.ppn.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Total Nilai Sewa</div><div class="ipv org" style="font-weight:700;">Rp ${a.sewa?a.sewa.toLocaleString('id-ID'):'—'}</div></div>
-      <div class="ipr"><div class="ipl">Masa Sewa</div><div class="ipv">${a.masaSewa||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Masa Awal</div><div class="ipv">${a.masaAwal?new Date(a.masaAwal).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Masa Akhir</div><div class="ipv">${a.masaAkhir?new Date(a.masaAkhir).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—'}</div></div>
       <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org" style="font-weight:700;">${perTh?'Rp '+perTh.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / m² / Bulan</div><div class="ipv org" style="font-weight:700;">${perM2Bulan?'Rp '+perM2Bulan.toLocaleString('id-ID'):'—'}</div></div>
@@ -908,30 +912,57 @@ function buildList(){
     const c=TC[type];
     h+=`<div class="lsh">${lbl[type]} (${g[type].length})</div>`;
     const isK=type==='komersial';
-    h+=`<table class="atbl"><thead><tr>
-      <th>Nama Area</th>
-      <th>Peruntukan</th>
-      <th style="text-align:right;">Luas</th>
-      <th>Lantai</th>`
-      +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
-      +`<th class="ax">Aksi</th></tr></thead><tbody>`;
-    g[type].forEach(a=>{
-      const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
-      h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
-        <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
-        <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
-        <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
-        <td>${esc(a.lantai)||'<span class="mu">—</span>'}</td>`
-        +(isK?`<td class="py">${esc(a.penyewa)||'<span class="mu">—</span>'}</td>
-          <td style="text-align:right;" class="rp">${rp(a.sewa)}</td>
+    const fmtD=s=>s?new Date(s).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'';
+    if(isK){
+      h+=`<table class="atbl"><thead><tr>
+        <th>Nama Area</th><th>Penyewa</th><th>Perjanjian</th><th>Tanggal</th>
+        <th>Peruntukan</th><th style="text-align:right;">Luas</th>
+        <th>Masa Awal</th><th>Masa Akhir</th><th>Jangka Waktu</th>
+        <th style="text-align:right;">Total Sewa</th>
+        <th style="text-align:right;">Nilai Sewa/Tahun</th>
+        <th style="text-align:right;">Nilai Sewa/m²/Bulan</th>
+        <th class="ax">Aksi</th></tr></thead><tbody>`;
+      g[type].forEach(a=>{
+        const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
+        const th=parseTahun(a.jangkaWaktu);
+        const sewa=Number(a.sewa)||0;
+        const perTh=th>0&&sewa?Math.round(sewa/th):0;
+        const perM2B=th>0&&a.nilaiPokok&&a.luas?Math.round(Number(a.nilaiPokok)/Number(a.luas)/th/12):0;
+        h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
+          <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
+          <td class="py">${esc(a.penyewa)||'<span class="mu">—</span>'}</td>
+          <td>${esc(a.nomorPerjanjian)||'<span class="mu">—</span>'}</td>
+          <td>${a.tglPerjanjian?esc(fmtD(a.tglPerjanjian)):'<span class="mu">—</span>'}</td>
+          <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
+          <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
+          <td>${a.masaAwal?esc(fmtD(a.masaAwal)):'<span class="mu">—</span>'}</td>
+          <td>${a.masaAkhir?esc(fmtD(a.masaAkhir)):'<span class="mu">—</span>'}</td>
           <td>${esc(a.jangkaWaktu)||'<span class="mu">—</span>'}</td>
-          <td>${esc(a.masaSewa)||'<span class="mu">—</span>'}</td>`:'')
-        +`<td class="ax">
-          <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
-          <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
-        </td>
-      </tr>`;
-    });
+          <td style="text-align:right;" class="rp">${rp(a.sewa)}</td>
+          <td style="text-align:right;" class="rp">${rp(perTh)}</td>
+          <td style="text-align:right;" class="rp">${rp(perM2B)}</td>
+          <td class="ax">
+            <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
+            <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
+          </td></tr>`;
+      });
+    } else {
+      h+=`<table class="atbl"><thead><tr>
+        <th>Nama Area</th><th>Peruntukan</th><th style="text-align:right;">Luas</th><th>Lantai</th>
+        <th class="ax">Aksi</th></tr></thead><tbody>`;
+      g[type].forEach(a=>{
+        const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
+        h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
+          <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
+          <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
+          <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
+          <td>${esc(a.lantai)||'<span class="mu">—</span>'}</td>
+          <td class="ax">
+            <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
+            <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
+          </td></tr>`;
+      });
+    }
     h+=`</tbody></table>`;
   });
   document.getElementById('lcont').innerHTML=h;
@@ -962,7 +993,8 @@ function exportExcel(){
         'Jangka Waktu':a.jangkaWaktu||'',
         'Nilai Sewa / Tahun':th?Math.round(sewa/th):'',
         'Nilai Sewa / m² / Bulan':th&&a.luas?Math.round((Number(a.nilaiPokok)||0)/Number(a.luas)/th/12):'',
-        'Masa Sewa':a.masaSewa||'',
+        'Masa Awal':a.masaAwal||'',
+        'Masa Akhir':a.masaAkhir||'',
         'Nomor Perjanjian':a.nomorPerjanjian||'',
         'Tanggal Perjanjian':a.tglPerjanjian||''
       };
