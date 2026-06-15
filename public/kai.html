@@ -1004,8 +1004,8 @@ function downloadDenah(){
     const c=TC[a.type]||TC.komersial;
     if(a.shape==='point'){
       const a2={...a,y:a.y+pad};
-      drawPointS(oc,a2.x,a2.y,c,false);
-      drawLbl(oc,a2,c,{x:a2.x,y:a2.y+POINT_R+8},null);
+      drawPointS(oc,a2.x,a2.y,c,false,8);
+      drawLbl(oc,a2,c,{x:a2.x,y:a2.y+16},null);
     } else if(a.shape==='poly'&&a.points){
       const pts=a.points.map(p=>({x:p.x,y:p.y+pad}));
       drawPolyS(oc,pts,c,false);drawLbl(oc,{...a},c,polyCen(pts),pts);
