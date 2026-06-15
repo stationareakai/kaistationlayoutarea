@@ -836,6 +836,8 @@ function saveArea(){
   a.sewa=a.nilaiPokok+a.biayaAdmin+a.com+a.ppn;
   a.masaSewa=document.getElementById('ams').value;
   a.jangkaWaktu=document.getElementById('ajw').value;
+  a.nomorPerjanjian=document.getElementById('anp').value;
+  a.tglPerjanjian=document.getElementById('atp').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
   if(_pendingFoto==='__REMOVE__')delete a.foto;
   else if(_pendingFoto)a.foto=_pendingFoto;
