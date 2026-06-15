@@ -993,7 +993,8 @@ function exportExcel(){
         'Jangka Waktu':a.jangkaWaktu||'',
         'Nilai Sewa / Tahun':th?Math.round(sewa/th):'',
         'Nilai Sewa / m² / Bulan':th&&a.luas?Math.round((Number(a.nilaiPokok)||0)/Number(a.luas)/th/12):'',
-        'Masa Sewa':a.masaSewa||'',
+        'Masa Awal':a.masaAwal||'',
+        'Masa Akhir':a.masaAkhir||'',
         'Nomor Perjanjian':a.nomorPerjanjian||'',
         'Tanggal Perjanjian':a.tglPerjanjian||''
       };
