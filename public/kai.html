@@ -369,6 +369,10 @@
         </div>
         <div class="fg"><label class="fl">Total Nilai Sewa (Rp)</label><input class="fi" id="as2" type="number" placeholder="0" readonly style="background:#f5f7fb;font-weight:700;color:#d97706;"></div>
         <div class="fr">
+          <div class="fg"><label class="fl">Nomor Perjanjian</label><input class="fi" id="anp" placeholder="No. perjanjian sewa"></div>
+          <div class="fg"><label class="fl">Tanggal Perjanjian</label><input class="fi" id="atp" type="date"></div>
+        </div>
+        <div class="fr">
           <div class="fg"><label class="fl">Masa Sewa</label><input class="fi" id="ams" placeholder="2023–2026"></div>
           <div class="fg"><label class="fl">Jangka Waktu</label><input class="fi" id="ajw" placeholder="3 tahun"></div>
         </div>
@@ -643,12 +647,13 @@ function scaleA(a,s){
   if(a.shape==='point')return{...a,x:a.x*s,y:a.y*s,w:0,h:0};
   return{...a,x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
 }
-const POINT_R=14;
+const POINT_R=6;
 function drawAreaD(a,sel){
   const c=TC[a.type]||TC.komersial;
   if(a.shape==='point'){
-    drawPointS(ctx,a.x,a.y,c,sel);
-    drawLbl(ctx,a,c,{x:a.x,y:a.y+POINT_R+8},null);
+    const r=POINT_R*scale;
+    drawPointS(ctx,a.x,a.y,c,sel,r);
+    drawLbl(ctx,a,c,{x:a.x,y:a.y+r+8},null);
   } else if(a.shape==='poly'&&a.points&&a.points.length>2){
     drawPolyS(ctx,a.points,c,sel);
     drawLbl(ctx,a,c,polyCen(a.points),a.points);
@@ -658,10 +663,11 @@ function drawAreaD(a,sel){
     drawLbl(ctx,a,c,{x:a.x+a.w/2,y:a.y+a.h/2},null,{w:a.w,h:a.h});
   }
 }
-function drawPointS(oc,x,y,c,sel){
-  oc.beginPath();oc.arc(x,y,POINT_R,0,Math.PI*2);
+function drawPointS(oc,x,y,c,sel,r){
+  r=r||POINT_R;
+  oc.beginPath();oc.arc(x,y,r,0,Math.PI*2);
   oc.fillStyle=c.stroke;oc.fill();
-  oc.strokeStyle=sel?'#002060':'#fff';oc.lineWidth=sel?3:2;oc.stroke();
+  oc.strokeStyle=sel?'#002060':'#fff';oc.lineWidth=sel?2:1.5;oc.stroke();
 }
 function drawPolyS(oc,pts,c,sel){
   oc.beginPath();oc.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>oc.lineTo(p.x,p.y));oc.closePath();
@@ -728,7 +734,7 @@ function closePoly(){
   polyPts=[];cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
 }
 function cancelPoly(){polyDrawing=false;polyPts=[];document.getElementById('poly-hint').classList.remove('show');redraw();}
-function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='point'){const dx=x-a.x,dy=y-a.y;if(dx*dx+dy*dy<=(POINT_R+2)*(POINT_R+2))return a;}else if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
+function hitTest(x,y){const hr=POINT_R+4/scale;for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='point'){const dx=x-a.x,dy=y-a.y;if(dx*dx+dy*dy<=hr*hr)return a;}else if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
 function ptInPoly(x,y,pts){let inside=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const xi=pts[i].x,yi=pts[i].y,xj=pts[j].x,yj=pts[j].y;if((yi>y)!=(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)inside=!inside;}return inside;}
 
 function doZoom(d){scale=Math.min(3,Math.max(0.3,+(scale+d).toFixed(2)));document.getElementById('zlbl').textContent=Math.round(scale*100)+'%';if(bgImg&&bgImg.naturalWidth)resizeCvs();redraw();}
@@ -761,6 +767,8 @@ function openAM(a){
   calcTotal();
   document.getElementById('ams').value=a.masaSewa||'';
   document.getElementById('ajw').value=a.jangkaWaktu||'';
+  document.getElementById('anp').value=a.nomorPerjanjian||'';
+  document.getElementById('atp').value=a.tglPerjanjian||'';
   document.getElementById('ast').value=a.status||'aktif';
   document.getElementById('ac').value=a.catatan||'';
   // hapus semua sel class dulu
@@ -830,6 +838,8 @@ function saveArea(){
   a.sewa=a.nilaiPokok+a.biayaAdmin+a.com+a.ppn;
   a.masaSewa=document.getElementById('ams').value;
   a.jangkaWaktu=document.getElementById('ajw').value;
+  a.nomorPerjanjian=document.getElementById('anp').value;
+  a.tglPerjanjian=document.getElementById('atp').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
   if(_pendingFoto==='__REMOVE__')delete a.foto;
   else if(_pendingFoto)a.foto=_pendingFoto;
@@ -874,6 +884,8 @@ function showInfo(a){
       <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org" style="font-weight:700;">${perTh?'Rp '+perTh.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / m² / Bulan</div><div class="ipv org" style="font-weight:700;">${perM2Bulan?'Rp '+perM2Bulan.toLocaleString('id-ID'):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Nomor Perjanjian</div><div class="ipv">${a.nomorPerjanjian||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Tanggal Perjanjian</div><div class="ipv">${a.tglPerjanjian?new Date(a.tglPerjanjian).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—'}</div></div>
       <div class="ipr"><div class="ipl">Status</div><span class="stb ${scls}">${sc2}</span></div>
       ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
   }
@@ -950,7 +962,9 @@ function exportExcel(){
         'Jangka Waktu':a.jangkaWaktu||'',
         'Nilai Sewa / Tahun':th?Math.round(sewa/th):'',
         'Nilai Sewa / m² / Bulan':th&&a.luas?Math.round((Number(a.nilaiPokok)||0)/Number(a.luas)/th/12):'',
-        'Masa Sewa':a.masaSewa||''
+        'Masa Sewa':a.masaSewa||'',
+        'Nomor Perjanjian':a.nomorPerjanjian||'',
+        'Tanggal Perjanjian':a.tglPerjanjian||''
       };
     });
     const ws=XLSX.utils.json_to_sheet(rows);
@@ -990,8 +1004,8 @@ function downloadDenah(){
     const c=TC[a.type]||TC.komersial;
     if(a.shape==='point'){
       const a2={...a,y:a.y+pad};
-      drawPointS(oc,a2.x,a2.y,c,false);
-      drawLbl(oc,a2,c,{x:a2.x,y:a2.y+POINT_R+8},null);
+      drawPointS(oc,a2.x,a2.y,c,false,8);
+      drawLbl(oc,a2,c,{x:a2.x,y:a2.y+16},null);
     } else if(a.shape==='poly'&&a.points){
       const pts=a.points.map(p=>({x:p.x,y:p.y+pad}));
       drawPolyS(oc,pts,c,false);drawLbl(oc,{...a},c,polyCen(pts),pts);
