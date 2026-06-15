@@ -912,30 +912,57 @@ function buildList(){
     const c=TC[type];
     h+=`<div class="lsh">${lbl[type]} (${g[type].length})</div>`;
     const isK=type==='komersial';
-    h+=`<table class="atbl"><thead><tr>
-      <th>Nama Area</th>
-      <th>Peruntukan</th>
-      <th style="text-align:right;">Luas</th>
-      <th>Lantai</th>`
-      +(isK?`<th>Penyewa</th><th style="text-align:right;">Total Sewa</th><th>Jangka</th><th>Masa Sewa</th>`:'')
-      +`<th class="ax">Aksi</th></tr></thead><tbody>`;
-    g[type].forEach(a=>{
-      const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
-      h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
-        <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
-        <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
-        <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
-        <td>${esc(a.lantai)||'<span class="mu">—</span>'}</td>`
-        +(isK?`<td class="py">${esc(a.penyewa)||'<span class="mu">—</span>'}</td>
-          <td style="text-align:right;" class="rp">${rp(a.sewa)}</td>
+    const fmtD=s=>s?new Date(s).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'';
+    if(isK){
+      h+=`<table class="atbl"><thead><tr>
+        <th>Nama Area</th><th>Penyewa</th><th>Perjanjian</th><th>Tanggal</th>
+        <th>Peruntukan</th><th style="text-align:right;">Luas</th>
+        <th>Masa Awal</th><th>Masa Akhir</th><th>Jangka Waktu</th>
+        <th style="text-align:right;">Total Sewa</th>
+        <th style="text-align:right;">Nilai Sewa/Tahun</th>
+        <th style="text-align:right;">Nilai Sewa/m²/Bulan</th>
+        <th class="ax">Aksi</th></tr></thead><tbody>`;
+      g[type].forEach(a=>{
+        const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
+        const th=parseTahun(a.jangkaWaktu);
+        const sewa=Number(a.sewa)||0;
+        const perTh=th>0&&sewa?Math.round(sewa/th):0;
+        const perM2B=th>0&&a.nilaiPokok&&a.luas?Math.round(Number(a.nilaiPokok)/Number(a.luas)/th/12):0;
+        h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
+          <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
+          <td class="py">${esc(a.penyewa)||'<span class="mu">—</span>'}</td>
+          <td>${esc(a.nomorPerjanjian)||'<span class="mu">—</span>'}</td>
+          <td>${a.tglPerjanjian?esc(fmtD(a.tglPerjanjian)):'<span class="mu">—</span>'}</td>
+          <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
+          <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
+          <td>${a.masaAwal?esc(fmtD(a.masaAwal)):'<span class="mu">—</span>'}</td>
+          <td>${a.masaAkhir?esc(fmtD(a.masaAkhir)):'<span class="mu">—</span>'}</td>
           <td>${esc(a.jangkaWaktu)||'<span class="mu">—</span>'}</td>
-          <td>${esc(a.masaSewa)||'<span class="mu">—</span>'}</td>`:'')
-        +`<td class="ax">
-          <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
-          <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
-        </td>
-      </tr>`;
-    });
+          <td style="text-align:right;" class="rp">${rp(a.sewa)}</td>
+          <td style="text-align:right;" class="rp">${rp(perTh)}</td>
+          <td style="text-align:right;" class="rp">${rp(perM2B)}</td>
+          <td class="ax">
+            <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
+            <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
+          </td></tr>`;
+      });
+    } else {
+      h+=`<table class="atbl"><thead><tr>
+        <th>Nama Area</th><th>Peruntukan</th><th style="text-align:right;">Luas</th><th>Lantai</th>
+        <th class="ax">Aksi</th></tr></thead><tbody>`;
+      g[type].forEach(a=>{
+        const shp=a.shape==='poly'?'⬡':a.shape==='point'?'●':'▭';
+        h+=`<tr class="${a.id===selId?'sel':''}" onclick="hlArea('${a.id}')">
+          <td><div class="nm">${shp} ${esc(a.nama)||'<span class="mu">(Tanpa nama)</span>'}</div></td>
+          <td>${esc(a.peruntukan)||'<span class="mu">—</span>'}</td>
+          <td style="text-align:right;" class="py">${a.luas?esc(a.luas)+' <span class="mu">m²</span>':'<span class="mu">—</span>'}</td>
+          <td>${esc(a.lantai)||'<span class="mu">—</span>'}</td>
+          <td class="ax">
+            <button class="ebtn" title="Edit" onclick="event.stopPropagation();openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏</button>
+            <button class="xbtn" title="Hapus" onclick="event.stopPropagation();qdel('${a.id}')">✕</button>
+          </td></tr>`;
+      });
+    }
     h+=`</tbody></table>`;
   });
   document.getElementById('lcont').innerHTML=h;
