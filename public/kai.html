@@ -883,7 +883,8 @@ function showInfo(a){
       <div class="ipr"><div class="ipl">COM</div><div class="ipv">Rp ${a.com?a.com.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">PPN</div><div class="ipv">Rp ${a.ppn?a.ppn.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Total Nilai Sewa</div><div class="ipv org" style="font-weight:700;">Rp ${a.sewa?a.sewa.toLocaleString('id-ID'):'—'}</div></div>
-      <div class="ipr"><div class="ipl">Masa Sewa</div><div class="ipv">${a.masaSewa||'—'}</div></div>
+      <div class="ipr"><div class="ipl">Masa Awal</div><div class="ipv">${a.masaAwal?new Date(a.masaAwal).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—'}</div></div>
+      <div class="ipr"><div class="ipl">Masa Akhir</div><div class="ipv">${a.masaAkhir?new Date(a.masaAkhir).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—'}</div></div>
       <div class="ipr"><div class="ipl">Jangka Waktu</div><div class="ipv">${a.jangkaWaktu||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / Tahun</div><div class="ipv org" style="font-weight:700;">${perTh?'Rp '+perTh.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Sewa / m² / Bulan</div><div class="ipv org" style="font-weight:700;">${perM2Bulan?'Rp '+perM2Bulan.toLocaleString('id-ID'):'—'}</div></div>
