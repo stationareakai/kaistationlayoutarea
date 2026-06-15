@@ -734,7 +734,7 @@ function closePoly(){
   polyPts=[];cur.areas.push(a);save();selId=a.id;redraw();openAM(a);
 }
 function cancelPoly(){polyDrawing=false;polyPts=[];document.getElementById('poly-hint').classList.remove('show');redraw();}
-function hitTest(x,y){for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='point'){const dx=x-a.x,dy=y-a.y;if(dx*dx+dy*dy<=(POINT_R+2)*(POINT_R+2))return a;}else if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
+function hitTest(x,y){const hr=POINT_R+4/scale;for(let i=cur.areas.length-1;i>=0;i--){const a=cur.areas[i];if(a.shape==='point'){const dx=x-a.x,dy=y-a.y;if(dx*dx+dy*dy<=hr*hr)return a;}else if(a.shape==='poly'&&a.points){if(ptInPoly(x,y,a.points))return a;}else{if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)return a;}}return null;}
 function ptInPoly(x,y,pts){let inside=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const xi=pts[i].x,yi=pts[i].y,xj=pts[j].x,yj=pts[j].y;if((yi>y)!=(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)inside=!inside;}return inside;}
 
 function doZoom(d){scale=Math.min(3,Math.max(0.3,+(scale+d).toFixed(2)));document.getElementById('zlbl').textContent=Math.round(scale*100)+'%';if(bgImg&&bgImg.naturalWidth)resizeCvs();redraw();}
