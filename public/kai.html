@@ -647,12 +647,13 @@ function scaleA(a,s){
   if(a.shape==='point')return{...a,x:a.x*s,y:a.y*s,w:0,h:0};
   return{...a,x:a.x*s,y:a.y*s,w:a.w*s,h:a.h*s};
 }
-const POINT_R=14;
+const POINT_R=6;
 function drawAreaD(a,sel){
   const c=TC[a.type]||TC.komersial;
   if(a.shape==='point'){
-    drawPointS(ctx,a.x,a.y,c,sel);
-    drawLbl(ctx,a,c,{x:a.x,y:a.y+POINT_R+8},null);
+    const r=POINT_R*scale;
+    drawPointS(ctx,a.x,a.y,c,sel,r);
+    drawLbl(ctx,a,c,{x:a.x,y:a.y+r+8},null);
   } else if(a.shape==='poly'&&a.points&&a.points.length>2){
     drawPolyS(ctx,a.points,c,sel);
     drawLbl(ctx,a,c,polyCen(a.points),a.points);
@@ -662,10 +663,11 @@ function drawAreaD(a,sel){
     drawLbl(ctx,a,c,{x:a.x+a.w/2,y:a.y+a.h/2},null,{w:a.w,h:a.h});
   }
 }
-function drawPointS(oc,x,y,c,sel){
-  oc.beginPath();oc.arc(x,y,POINT_R,0,Math.PI*2);
+function drawPointS(oc,x,y,c,sel,r){
+  r=r||POINT_R;
+  oc.beginPath();oc.arc(x,y,r,0,Math.PI*2);
   oc.fillStyle=c.stroke;oc.fill();
-  oc.strokeStyle=sel?'#002060':'#fff';oc.lineWidth=sel?3:2;oc.stroke();
+  oc.strokeStyle=sel?'#002060':'#fff';oc.lineWidth=sel?2:1.5;oc.stroke();
 }
 function drawPolyS(oc,pts,c,sel){
   oc.beginPath();oc.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(p=>oc.lineTo(p.x,p.y));oc.closePath();
