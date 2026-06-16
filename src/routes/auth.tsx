@@ -21,13 +21,6 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: "/", replace: true });
-    });
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -44,13 +37,31 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        // Sign out immediately — new accounts must wait for admin approval
+        await supabase.auth.signOut();
         setInfo(
-          "Akun berhasil dibuat. Akses Anda menunggu persetujuan admin — admin akan menetapkan role (Editor / Viewer) sebelum Anda dapat menggunakan aplikasi.",
+          "Akun berhasil dibuat. Akses Anda menunggu persetujuan admin — admin akan menetapkan role (Editor / Viewer) sebelum Anda dapat masuk.",
         );
         setMode("login");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        const userId = signInData.user?.id;
+        if (!userId) throw new Error("Gagal masuk");
+        // Verify the user has been assigned a role by an admin
+        const { data: roles, error: rolesErr } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId);
+        if (rolesErr) throw rolesErr;
+        if (!roles || roles.length === 0) {
+          await supabase.auth.signOut();
+          setError(
+            "Akun Anda belum disetujui admin. Silakan hubungi admin untuk mendapatkan role Editor atau Viewer.",
+          );
+          return;
+        }
+        navigate({ to: "/", replace: true });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan");
