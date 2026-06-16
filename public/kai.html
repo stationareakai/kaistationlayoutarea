@@ -1080,10 +1080,17 @@ async function bootstrap(){
   // Detect role via user_roles
   const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',user.id);
   const myRoles=Array.isArray(roles)?roles.map(r=>r.role):[];
+  // Block accounts without an assigned role — must wait for admin approval
+  if(myRoles.length===0){
+    alert('Akun Anda belum disetujui admin. Silakan hubungi admin untuk diberi role Editor atau Viewer.');
+    try{ await sb.auth.signOut(); }catch(_){}
+    gotoAuth();return;
+  }
   IS_ADMIN=myRoles.includes('admin');
   IS_EDITOR=myRoles.includes('editor');
   IS_WRITER=IS_ADMIN||IS_EDITOR;
   MY_ROLE=IS_ADMIN?'admin':(IS_EDITOR?'editor':(myRoles.includes('viewer')?'viewer':''));
+  if(!IS_WRITER){document.body.classList.add('viewer-mode');}
   const chip=document.getElementById('userChip');
   if(chip){
     chip.style.display='flex';
