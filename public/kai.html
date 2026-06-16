@@ -32,6 +32,12 @@
   .lobtn{background:#fff;border:1px solid #e2e8f0;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer;}
   .lobtn:hover{background:#fef2f2;}
   .ro-banner{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;z-index:1000;box-shadow:0 8px 24px -8px rgba(0,0,0,.3);}
+  body.viewer-mode .sb-add,
+  body.viewer-mode #tab-u,
+  body.viewer-mode .toolbar-wrap,
+  body.viewer-mode .eabtn,
+  body.viewer-mode .ebtn,
+  body.viewer-mode .xbtn{display:none !important;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -757,6 +763,7 @@ function setType(k){
 
 // openAM — set selected class sesuai warna tipe
 function openAM(a){
+  if(!IS_WRITER)return;
   editId=a.id;_pendingFoto=null;
   document.getElementById('an').value=a.nama||'';document.getElementById('ap').value=a.peruntukan||'';
   document.getElementById('al').value=a.luas||'';document.getElementById('alt2').value=a.lantai||'';
@@ -968,7 +975,7 @@ function buildList(){
   document.getElementById('lcont').innerHTML=h;
 }
 function hlArea(id){selId=id;const a=cur.areas.find(x=>x.id===id);if(a){buildList();showInfo(a);switchTab('denah',document.getElementById('tab-d'));}}
-function qdel(id){if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
+function qdel(id){if(!IS_WRITER)return;if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
 function exportExcel(){
   if(typeof XLSX==='undefined'){alert('Library Excel belum siap, coba lagi sebentar.');return;}
   if(!cur||!cur.areas||!cur.areas.length){alert('Belum ada area untuk diekspor.');return;}
@@ -1056,7 +1063,7 @@ function downloadDenah(){
   const link=document.createElement('a');link.download=(cur.code||'denah')+'-denah.png';link.href=oc2.toDataURL('image/png');link.click();
 }
 
-function showAddStn(){document.getElementById('ms').classList.add('open');}
+function showAddStn(){if(!IS_WRITER)return;document.getElementById('ms').classList.add('open');}
 function addStn(){
   const name=document.getElementById('nsn').value.trim();if(!name){alert('Nama stasiun wajib!');return;}
   const s={id:'s'+Date.now(),name:name.startsWith('Stasiun')?name:'Stasiun '+name,code:document.getElementById('nsc').value.toUpperCase(),kota:document.getElementById('nsk').value,group:document.getElementById('nsg').value,kelas:document.getElementById('nsl').value,image:null,areas:[]};
@@ -1073,10 +1080,17 @@ async function bootstrap(){
   // Detect role via user_roles
   const {data:roles}=await sb.from('user_roles').select('role').eq('user_id',user.id);
   const myRoles=Array.isArray(roles)?roles.map(r=>r.role):[];
+  // Block accounts without an assigned role — must wait for admin approval
+  if(myRoles.length===0){
+    alert('Akun Anda belum disetujui admin. Silakan hubungi admin untuk diberi role Editor atau Viewer.');
+    try{ await sb.auth.signOut(); }catch(_){}
+    gotoAuth();return;
+  }
   IS_ADMIN=myRoles.includes('admin');
   IS_EDITOR=myRoles.includes('editor');
   IS_WRITER=IS_ADMIN||IS_EDITOR;
   MY_ROLE=IS_ADMIN?'admin':(IS_EDITOR?'editor':(myRoles.includes('viewer')?'viewer':''));
+  if(!IS_WRITER){document.body.classList.add('viewer-mode');}
   const chip=document.getElementById('userChip');
   if(chip){
     chip.style.display='flex';
