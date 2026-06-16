@@ -763,6 +763,7 @@ function setType(k){
 
 // openAM — set selected class sesuai warna tipe
 function openAM(a){
+  if(!IS_WRITER)return;
   editId=a.id;_pendingFoto=null;
   document.getElementById('an').value=a.nama||'';document.getElementById('ap').value=a.peruntukan||'';
   document.getElementById('al').value=a.luas||'';document.getElementById('alt2').value=a.lantai||'';
