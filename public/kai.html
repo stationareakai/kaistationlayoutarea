@@ -975,7 +975,7 @@ function buildList(){
   document.getElementById('lcont').innerHTML=h;
 }
 function hlArea(id){selId=id;const a=cur.areas.find(x=>x.id===id);if(a){buildList();showInfo(a);switchTab('denah',document.getElementById('tab-d'));}}
-function qdel(id){if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
+function qdel(id){if(!IS_WRITER)return;if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
 function exportExcel(){
   if(typeof XLSX==='undefined'){alert('Library Excel belum siap, coba lagi sebentar.');return;}
   if(!cur||!cur.areas||!cur.areas.length){alert('Belum ada area untuk diekspor.');return;}
