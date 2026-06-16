@@ -1063,7 +1063,7 @@ function downloadDenah(){
   const link=document.createElement('a');link.download=(cur.code||'denah')+'-denah.png';link.href=oc2.toDataURL('image/png');link.click();
 }
 
-function showAddStn(){document.getElementById('ms').classList.add('open');}
+function showAddStn(){if(!IS_WRITER)return;document.getElementById('ms').classList.add('open');}
 function addStn(){
   const name=document.getElementById('nsn').value.trim();if(!name){alert('Nama stasiun wajib!');return;}
   const s={id:'s'+Date.now(),name:name.startsWith('Stasiun')?name:'Stasiun '+name,code:document.getElementById('nsc').value.toUpperCase(),kota:document.getElementById('nsk').value,group:document.getElementById('nsg').value,kelas:document.getElementById('nsl').value,image:null,areas:[]};
