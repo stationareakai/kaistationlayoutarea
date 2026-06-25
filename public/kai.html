@@ -258,9 +258,12 @@
       <div id="pd" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
         <div class="leg-row">
           <!-- legenda warna baru -->
-          <div class="leg"><div class="lb" style="background:rgba(22,163,74,0.22);border-color:#16a34a;"></div>Komersial</div>
-          <div class="leg"><div class="lb" style="background:rgba(26,111,216,0.22);border-color:#1a6fd8;"></div>Pelayanan</div>
-          <div class="leg"><div class="lb" style="background:rgba(232,101,10,0.22);border-color:#e8650a;"></div>Operasional</div>
+          <div class="leg"><div class="lb" style="background:rgba(22,163,74,0.22);border-color:#16a34a;"></div>Komersial Terisi</div>
+          <div class="leg"><div class="lb" style="background:rgba(20,83,45,0.45);border-color:#14532d;"></div>Komersial Kosong</div>
+          <div class="leg"><div class="lb" style="background:rgba(26,111,216,0.22);border-color:#1a6fd8;"></div>Pelayanan Terisi</div>
+          <div class="leg"><div class="lb" style="background:rgba(30,58,138,0.45);border-color:#1e3a8a;"></div>Pelayanan Kosong</div>
+          <div class="leg"><div class="lb" style="background:rgba(232,101,10,0.22);border-color:#e8650a;"></div>Operasional Terisi</div>
+          <div class="leg"><div class="lb" style="background:rgba(124,45,18,0.45);border-color:#7c2d12;"></div>Operasional Kosong</div>
           <div class="mhint" id="mhint">Mode: Pilih/Klik</div>
         </div>
         <div class="toolbar-wrap">
@@ -552,11 +555,18 @@ let polyPts=[],polyDrawing=false,mouseX=0,mouseY=0;
 let cvs,ctx,scale=1;
 
 // Warna baru: komersial=hijau, pelayanan=biru, operasional=oranye
+// Terisi=fill muda/transparan, Kosong=fill lebih gelap/tua
 const TC={
   komersial:{fill:'rgba(22,163,74,0.22)',stroke:'#16a34a',numBg:'#16a34a',numTxt:'#fff',labelTxt:'#14532d',labelBg:'rgba(220,252,231,0.90)'},
   pelayanan: {fill:'rgba(26,111,216,0.22)',stroke:'#1a6fd8',numBg:'#1a6fd8',numTxt:'#fff',labelTxt:'#042c53',labelBg:'rgba(220,238,255,0.90)'},
   operasional:{fill:'rgba(232,101,10,0.22)',stroke:'#e8650a',numBg:'#e8650a',numTxt:'#fff',labelTxt:'#7a2d00',labelBg:'rgba(255,240,230,0.90)'},
 };
+const TC_KOSONG={
+  komersial:{fill:'rgba(20,83,45,0.45)',stroke:'#14532d',numBg:'#14532d',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(20,83,45,0.85)'},
+  pelayanan: {fill:'rgba(30,58,138,0.45)',stroke:'#1e3a8a',numBg:'#1e3a8a',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(30,58,138,0.85)'},
+  operasional:{fill:'rgba(124,45,18,0.45)',stroke:'#7c2d12',numBg:'#7c2d12',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(124,45,18,0.85)'},
+};
+function getTC(a){const base=TC[a.type]||TC.komersial;const kosong=TC_KOSONG[a.type]||TC_KOSONG.komersial;return(a.status==='kosong')?kosong:base;}
 
 const TIPS={
   select:'<b>Pilih/Klik:</b> Klik area untuk lihat info. Double-click untuk edit. Hapus area melalui tombol Hapus di form edit.',
@@ -658,7 +668,7 @@ function scaleA(a,s){
 }
 const POINT_R=6;
 function drawAreaD(a,sel){
-  const c=TC[a.type]||TC.komersial;
+  const c=getTC(a);
   if(a.shape==='point'){
     const r=POINT_R*scale;
     drawPointS(ctx,a.x,a.y,c,sel,r);
@@ -1042,7 +1052,7 @@ function downloadDenah(){
   if(bgImg&&bgImg.complete&&bgImg.naturalWidth)oc.drawImage(bgImg,0,pad,iW,iH);
   else{oc.fillStyle='#ccdff5';oc.fillRect(0,pad,iW,iH);}
   cur.areas.forEach(a=>{
-    const c=TC[a.type]||TC.komersial;
+    const c=getTC(a);
     if(a.shape==='point'){
       const a2={...a,y:a.y+pad};
       drawPointS(oc,a2.x,a2.y,c,false,8);
