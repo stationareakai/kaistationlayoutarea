@@ -110,6 +110,9 @@
 .lb{width:12px;height:12px;border-radius:2px;border:1.5px solid;}
 .mhint{margin-left:auto;font-size:10px;color:var(--kt3);font-style:italic;}
 .cwrap{position:relative;flex:1;overflow:auto;background:#ccdff5;cursor:crosshair;}
+.filter-bar{display:flex;align-items:center;gap:6px;padding:4px 10px;background:#f0f5ff;border-bottom:1px solid var(--kbd);flex-wrap:wrap;}
+.fsel{font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--kbd);background:#fff;color:var(--kt1);cursor:pointer;outline:none;}
+.fsel:focus{border-color:#1a6fd8;}
 .cwrap.sel{cursor:default;}.cwrap.poly{cursor:cell;}
 #cvs{display:block;}
 .noimg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--kt2);font-size:12px;text-align:center;padding:20px;pointer-events:none;}
@@ -258,12 +261,9 @@
       <div id="pd" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
         <div class="leg-row">
           <!-- legenda warna baru -->
-          <div class="leg"><div class="lb" style="background:rgba(0,165,80,0.22);border-color:#00A550;"></div>Komersial Terisi</div>
-          <div class="leg"><div class="lb" style="background:rgba(0,100,48,0.45);border-color:#006430;"></div>Komersial Kosong</div>
-          <div class="leg"><div class="lb" style="background:rgba(26,111,216,0.22);border-color:#1a6fd8;"></div>Pelayanan Terisi</div>
-          <div class="leg"><div class="lb" style="background:rgba(30,58,138,0.45);border-color:#1e3a8a;"></div>Pelayanan Kosong</div>
-          <div class="leg"><div class="lb" style="background:rgba(232,101,10,0.22);border-color:#e8650a;"></div>Operasional Terisi</div>
-          <div class="leg"><div class="lb" style="background:rgba(124,45,18,0.45);border-color:#7c2d12;"></div>Operasional Kosong</div>
+          <div class="leg"><div class="lb" style="background:rgba(0,165,80,0.22);border-color:#00A550;"></div>Komersial</div>
+          <div class="leg"><div class="lb" style="background:rgba(26,111,216,0.22);border-color:#1a6fd8;"></div>Pelayanan</div>
+          <div class="leg"><div class="lb" style="background:rgba(232,101,10,0.22);border-color:#e8650a;"></div>Operasional</div>
           <div class="mhint" id="mhint">Mode: Pilih/Klik</div>
         </div>
         <div class="toolbar-wrap">
@@ -283,6 +283,26 @@
           </div>
           <div class="toolbar-row2">
             <div class="tip-box" id="tip-box">Pilih mode di atas untuk mulai menambahkan area pada denah.</div>
+          <div class="filter-bar" id="filter-bar" style="display:none;">
+            <span style="font-size:10px;color:var(--kt3);font-weight:600;">FILTER:</span>
+            <span style="font-size:10px;color:var(--kt3);">Jenis Sewa:</span>
+            <select class="fsel" id="fjs" onchange="applyFilter()">
+              <option value="">Semua</option>
+              <option value="Retail">Retail</option>
+              <option value="ATM">ATM</option>
+              <option value="VM">VM</option>
+              <option value="Iklan">Iklan</option>
+            </select>
+            <span style="font-size:10px;color:var(--kt3);margin-left:6px;">Status:</span>
+            <select class="fsel" id="fst" onchange="applyFilter()">
+              <option value="">Semua</option>
+              <option value="aktif">Aktif</option>
+              <option value="kosong">Kosong</option>
+              <option value="proses">Dalam Proses</option>
+              <option value="expired">Expired</option>
+            </select>
+            <button class="tbtn" onclick="resetFilter()" style="margin-left:4px;font-size:10px;">✕ Reset</button>
+          </div>
           </div>
         </div>
         <div class="cwrap" id="cwrap">
@@ -387,6 +407,9 @@
           <div class="fg"><label class="fl">Masa Akhir</label><input class="fi" id="amk" type="date"></div>
         </div>
         <div class="fg"><label class="fl">Jangka Waktu</label><input class="fi" id="ajw" placeholder="3 tahun"></div>
+        <div class="fg"><label class="fl">Jenis Sewa</label>
+          <select class="fs" id="ajs"><option value="">— Pilih Jenis —</option><option value="Retail">Retail</option><option value="ATM">ATM</option><option value="VM">VM (Vending Machine)</option><option value="Iklan">Iklan</option></select>
+        </div>
         <div class="fg"><label class="fl">Status Sewa</label>
           <select class="fs" id="ast"><option value="aktif">Aktif</option><option value="kosong">Kosong</option><option value="proses">Dalam Proses</option><option value="expired">Expired</option></select>
         </div>
@@ -560,12 +583,7 @@ const TC={
   pelayanan: {fill:'rgba(26,111,216,0.22)',stroke:'#1a6fd8',numBg:'#1a6fd8',numTxt:'#fff',labelTxt:'#042c53',labelBg:'rgba(220,238,255,0.90)'},
   operasional:{fill:'rgba(232,101,10,0.22)',stroke:'#e8650a',numBg:'#e8650a',numTxt:'#fff',labelTxt:'#7a2d00',labelBg:'rgba(255,240,230,0.90)'},
 };
-const TC_KOSONG={
-  komersial:{fill:'rgba(0,100,48,0.45)',stroke:'#006430',numBg:'#006430',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(0,100,48,0.85)'},
-  pelayanan: {fill:'rgba(30,58,138,0.45)',stroke:'#1e3a8a',numBg:'#1e3a8a',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(30,58,138,0.85)'},
-  operasional:{fill:'rgba(124,45,18,0.45)',stroke:'#7c2d12',numBg:'#7c2d12',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(124,45,18,0.85)'},
-};
-function getTC(a){const base=TC[a.type]||TC.komersial;const kosong=TC_KOSONG[a.type]||TC_KOSONG.komersial;return(a.status==='kosong')?kosong:base;}
+function getTC(a){return TC[a.type]||TC.komersial;}
 
 const TIPS={
   select:'<b>Pilih/Klik:</b> Klik area untuk lihat info. Double-click untuk edit. Hapus area melalui tombol Hapus di form edit.',
@@ -610,7 +628,7 @@ function buildDash(){
   }).join('');
 }
 function clickGrp(gid){const gs=stations.filter(s=>s.group===gid);const el=document.getElementById('gi-'+gid.replace(/\s/,'_'));if(el){el.classList.add('open');el.previousElementSibling.classList.add('open');}if(gs.length)openStn(gs[0].id);}
-function goHome(){cur=null;document.getElementById('pw').style.display='';document.getElementById('ps').style.display='none';document.getElementById('tabs-bar').style.display='none';document.getElementById('stn-name').textContent='Dashboard KAI';document.getElementById('stn-meta').textContent='Pilih stasiun dari sidebar';document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));closeInfo();buildDash();}
+function goHome(){cur=null;document.getElementById('pw').style.display='';document.getElementById('ps').style.display='none';document.getElementById('tabs-bar').style.display='none';document.getElementById('stn-name').textContent='Dashboard KAI';document.getElementById('stn-meta').textContent='Pilih stasiun dari sidebar';document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));closeInfo();buildDash();document.getElementById('filter-bar').style.display='none';resetFilter();}
 function openStn(id){
   cur=stations.find(s=>s.id===id);if(!cur)return;
   document.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));
@@ -621,6 +639,7 @@ function openStn(id){
   document.getElementById('pw').style.display='none';document.getElementById('ps').style.display='flex';
   document.getElementById('tabs-bar').style.display='flex';
   switchTab('denah',document.getElementById('tab-d'));
+  document.getElementById('filter-bar').style.display='flex';
 }
 function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');
@@ -654,7 +673,7 @@ function redraw(){
   if(bgImg&&bgImg.complete&&bgImg.naturalWidth){ctx.drawImage(bgImg,0,0,cvs.width,cvs.height);}
   else{ctx.fillStyle='#ccdff5';ctx.fillRect(0,0,cvs.width,cvs.height);drawGrid();}
   if(!cur)return;
-  cur.areas.forEach(a=>{const sa=scaleA(a,scale);drawAreaD(sa,a.id===selId);});
+  cur.areas.forEach(a=>{if(!areaVisible(a))return;const sa=scaleA(a,scale);drawAreaD(sa,a.id===selId);});
   if(tool==='poly'&&polyDrawing&&polyPts.length>0){
     drawPolyIP(polyPts.map(p=>({x:p.x*scale,y:p.y*scale})),mouseX*scale,mouseY*scale);
   }
@@ -789,6 +808,7 @@ function openAM(a){
   document.getElementById('ajw').value=a.jangkaWaktu||'';
   document.getElementById('anp').value=a.nomorPerjanjian||'';
   document.getElementById('atp').value=a.tglPerjanjian||'';
+  document.getElementById('ajs').value=a.jenisSewa||'';
   document.getElementById('ast').value=a.status||'aktif';
   document.getElementById('ac').value=a.catatan||'';
   // hapus semua sel class dulu
@@ -861,6 +881,7 @@ function saveArea(){
   a.jangkaWaktu=document.getElementById('ajw').value;
   a.nomorPerjanjian=document.getElementById('anp').value;
   a.tglPerjanjian=document.getElementById('atp').value;
+  a.jenisSewa=document.getElementById('ajs').value;
   a.status=document.getElementById('ast').value;a.catatan=document.getElementById('ac').value;
   if(_pendingFoto==='__REMOVE__')delete a.foto;
   else if(_pendingFoto)a.foto=_pendingFoto;
@@ -895,6 +916,7 @@ function showInfo(a){
     const perTh=th>0&&a.sewa?Math.round(a.sewa/th):0;
     const perM2Bulan=th>0&&a.nilaiPokok&&a.luas?Math.round(a.nilaiPokok/a.luas/th/12):0;
     h+=`<div class="ipd"></div>
+      <div class="ipr"><div class="ipl">Jenis Sewa</div><div class="ipv">${a.jenisSewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Penyewa</div><div class="ipv" style="font-weight:500;">${a.penyewa||'—'}</div></div>
       <div class="ipr"><div class="ipl">Nilai Pokok</div><div class="ipv">Rp ${a.nilaiPokok?a.nilaiPokok.toLocaleString('id-ID'):'—'}</div></div>
       <div class="ipr"><div class="ipl">Biaya Administrasi</div><div class="ipv">Rp ${a.biayaAdmin?a.biayaAdmin.toLocaleString('id-ID'):'—'}</div></div>
@@ -937,6 +959,25 @@ function positionPopup(canvasX, canvasY){
   ip.style.top = top + 'px';
 }
 function closeInfo(){document.getElementById('ip').classList.add('hidden');}
+
+// Filter
+let activeFilter={jenis:'',status:''};
+function applyFilter(){
+  activeFilter.jenis=document.getElementById('fjs').value;
+  activeFilter.status=document.getElementById('fst').value;
+  redraw();
+}
+function resetFilter(){
+  document.getElementById('fjs').value='';
+  document.getElementById('fst').value='';
+  activeFilter={jenis:'',status:''};
+  redraw();
+}
+function areaVisible(a){
+  if(activeFilter.jenis && a.jenisSewa!==activeFilter.jenis) return false;
+  if(activeFilter.status && (a.status||'aktif')!==activeFilter.status) return false;
+  return true;
+}
 
 function buildList(){
   if(!cur){document.getElementById('lcont').innerHTML='';return;}
