@@ -147,7 +147,7 @@
 .xbtn:hover{border-color:#fca5a5;color:#b91c1c;background:#fee2e2;}
 .ebtn{width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:#fff;cursor:pointer;font-size:11px;color:var(--kt2);display:inline-flex;align-items:center;justify-content:center;margin-right:2px;}
 .ebtn:hover{border-color:var(--ko);color:var(--ko);}
-.ip{position:absolute;width:260px;max-height:70vh;border-radius:12px;border:1px solid var(--kbd);display:flex;flex-direction:column;overflow:hidden;background:var(--kw);box-shadow:0 8px 32px -8px rgba(0,45,122,0.28),0 2px 8px -2px rgba(0,45,122,0.12);z-index:20;transition:opacity 0.15s;pointer-events:all;}
+.ip{position:absolute;width:260px;max-height:45vh;border-radius:12px;border:1px solid var(--kbd);display:flex;flex-direction:column;overflow:hidden;background:var(--kw);box-shadow:0 8px 32px -8px rgba(0,45,122,0.28),0 2px 8px -2px rgba(0,45,122,0.12);z-index:20;transition:opacity 0.15s;pointer-events:all;}
 .ip.hidden{display:none;}
 .iph{padding:12px;border-bottom:1px solid var(--kbd);}
 .iphr{display:flex;align-items:flex-start;justify-content:space-between;}
@@ -244,6 +244,7 @@
     <div class="tab active" id="tab-d" onclick="switchTab('denah',this)">🗺 Denah</div>
     <div class="tab" id="tab-u" onclick="switchTab('upload',this)">↑ Upload Denah</div>
     <div class="tab" id="tab-l" onclick="switchTab('list',this)">☰ Daftar Area</div>
+    <button id="delStnBtn" style="display:none;margin-left:auto;padding:4px 10px;border-radius:6px;border:1px solid #fca5a5;background:#fff;color:#b91c1c;font-size:11px;cursor:pointer;" onclick="deleteStation()">🗑 Hapus Stasiun</button>
   </div>
   <div class="tab-content" id="tcon">
 
@@ -473,7 +474,7 @@ const GROUPS=[
   {id:'Daop 1',city:'Jakarta',t:'d'},{id:'Daop 2',city:'Bandung',t:'d'},{id:'Daop 3',city:'Cirebon',t:'d'},
   {id:'Daop 4',city:'Semarang',t:'d'},{id:'Daop 5',city:'Purwokerto',t:'d'},{id:'Daop 6',city:'Yogyakarta',t:'d'},
   {id:'Daop 7',city:'Madiun',t:'d'},{id:'Daop 8',city:'Surabaya',t:'d'},{id:'Daop 9',city:'Jember',t:'d'},
-  {id:'Divre I',city:'Sumut',t:'v'},{id:'Divre II',city:'Sumbar',t:'v'},{id:'Divre III',city:'Sumsel',t:'v'},{id:'Divre IV',city:'Tanjungkarang',t:'v'},
+  {id:'Divre I',city:'Sumut',t:'v'},{id:'Divre II',city:'Sumbar',t:'v'},{id:'Divre III',city:'Palembang',t:'v'},{id:'Divre IV',city:'Tanjungkarang',t:'v'},
 ];
 const DEFAULT_STATIONS=[
   {id:'s1',name:'Stasiun Gambir',code:'GMR',kota:'Jakarta Pusat',group:'Daop 1',kelas:'Besar',image:null,areas:[]},
@@ -611,7 +612,28 @@ function buildNav(){
   });
 }
 function tgl(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('open');}
-function filterNav(q){document.querySelectorAll('.si').forEach(e=>{e.style.display=e.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});}
+function filterNav(q){
+  const ql=q.toLowerCase().trim();
+  let firstMatch=null;
+  document.querySelectorAll('.si').forEach(e=>{
+    const match=e.textContent.toLowerCase().includes(ql);
+    e.style.display=match?'':'none';
+    if(match&&!firstMatch) firstMatch=e;
+  });
+  // Auto-open groups yang ada hasil
+  document.querySelectorAll('.gi').forEach(gi=>{
+    const hasVisible=[...gi.querySelectorAll('.si')].some(e=>e.style.display!=='none');
+    if(ql){
+      gi.classList.toggle('open',hasVisible);
+      gi.previousElementSibling.classList.toggle('open',hasVisible);
+    }
+  });
+  // Auto-open stasiun pertama yang cocok
+  if(ql&&firstMatch){
+    const id=firstMatch.id.replace('si-','');
+    openStn(id);
+  }
+}
 
 function buildDash(){
   const tot=stations.reduce((a,s)=>a+s.areas.length,0);
@@ -638,6 +660,9 @@ function openStn(id){
   document.getElementById('stn-meta').textContent=`${cur.code} — ${cur.kota} | ${cur.group} | Kelas ${cur.kelas}`;
   document.getElementById('pw').style.display='none';document.getElementById('ps').style.display='flex';
   document.getElementById('tabs-bar').style.display='flex';
+  // Show/hide hapus stasiun button (admin only)
+  const delStnBtn=document.getElementById('delStnBtn');
+  if(delStnBtn) delStnBtn.style.display=IS_ADMIN?'inline-flex':'none';
   switchTab('denah',document.getElementById('tab-d'));
   document.getElementById('filter-bar').style.display='flex';
 }
@@ -892,6 +917,13 @@ function parseTahun(s){
   if(!s)return 0;
   const m=String(s).match(/(\d+(?:[.,]\d+)?)/);
   return m?parseFloat(m[1].replace(',','.')):0;
+}
+function deleteStation(){
+  if(!cur||!IS_ADMIN)return;
+  if(!confirm(`Hapus stasiun "${cur.name}"?\nSemua area dan data di dalamnya akan ikut terhapus permanen.`))return;
+  stations=stations.filter(s=>s.id!==cur.id);
+  save();goHome();buildNav();buildDash();
+  alert('Stasiun berhasil dihapus.');
 }
 function delArea(){
   if(!editId||!cur||!confirm('Hapus area ini?'))return;
