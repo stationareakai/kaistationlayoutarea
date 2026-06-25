@@ -144,7 +144,7 @@
 .xbtn:hover{border-color:#fca5a5;color:#b91c1c;background:#fee2e2;}
 .ebtn{width:22px;height:22px;border-radius:5px;border:1px solid var(--kbd);background:#fff;cursor:pointer;font-size:11px;color:var(--kt2);display:inline-flex;align-items:center;justify-content:center;margin-right:2px;}
 .ebtn:hover{border-color:var(--ko);color:var(--ko);}
-.ip{width:220px;flex-shrink:0;border-left:1px solid var(--kbd);display:flex;flex-direction:column;overflow:hidden;background:var(--kw);}
+.ip{position:absolute;width:260px;max-height:70vh;border-radius:12px;border:1px solid var(--kbd);display:flex;flex-direction:column;overflow:hidden;background:var(--kw);box-shadow:0 8px 32px -8px rgba(0,45,122,0.28),0 2px 8px -2px rgba(0,45,122,0.12);z-index:20;transition:opacity 0.15s;pointer-events:all;}
 .ip.hidden{display:none;}
 .iph{padding:12px;border-bottom:1px solid var(--kbd);}
 .iphr{display:flex;align-items:flex-start;justify-content:space-between;}
@@ -258,8 +258,8 @@
       <div id="pd" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
         <div class="leg-row">
           <!-- legenda warna baru -->
-          <div class="leg"><div class="lb" style="background:rgba(22,163,74,0.22);border-color:#16a34a;"></div>Komersial Terisi</div>
-          <div class="leg"><div class="lb" style="background:rgba(20,83,45,0.45);border-color:#14532d;"></div>Komersial Kosong</div>
+          <div class="leg"><div class="lb" style="background:rgba(0,165,80,0.22);border-color:#00A550;"></div>Komersial Terisi</div>
+          <div class="leg"><div class="lb" style="background:rgba(0,100,48,0.45);border-color:#006430;"></div>Komersial Kosong</div>
           <div class="leg"><div class="lb" style="background:rgba(26,111,216,0.22);border-color:#1a6fd8;"></div>Pelayanan Terisi</div>
           <div class="leg"><div class="lb" style="background:rgba(30,58,138,0.45);border-color:#1e3a8a;"></div>Pelayanan Kosong</div>
           <div class="leg"><div class="lb" style="background:rgba(232,101,10,0.22);border-color:#e8650a;"></div>Operasional Terisi</div>
@@ -286,6 +286,13 @@
           </div>
         </div>
         <div class="cwrap" id="cwrap">
+          <div class="ip hidden" id="ip">
+            <div class="iph">
+              <div class="iphr"><div class="ipn" id="ipn">—</div><button class="ipc" onclick="closeInfo()">✕</button></div>
+              <div class="ipbw" id="ipbw"></div>
+            </div>
+            <div class="ipb" id="ipb"></div>
+          </div>
           <canvas id="cvs"></canvas>
           <div class="noimg" id="noimg">
             <div style="font-size:36px;">🏢</div>
@@ -339,14 +346,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<div class="ip hidden" id="ip">
-  <div class="iph">
-    <div class="iphr"><div class="ipn" id="ipn">—</div><button class="ipc" onclick="closeInfo()">✕</button></div>
-    <div class="ipbw" id="ipbw"></div>
-  </div>
-  <div class="ipb" id="ipb"></div>
 </div>
 
 <!-- MODAL AREA -->
@@ -557,12 +556,12 @@ let cvs,ctx,scale=1;
 // Warna baru: komersial=hijau, pelayanan=biru, operasional=oranye
 // Terisi=fill muda/transparan, Kosong=fill lebih gelap/tua
 const TC={
-  komersial:{fill:'rgba(22,163,74,0.22)',stroke:'#16a34a',numBg:'#16a34a',numTxt:'#fff',labelTxt:'#14532d',labelBg:'rgba(220,252,231,0.90)'},
+  komersial:{fill:'rgba(0,165,80,0.22)',stroke:'#00A550',numBg:'#00A550',numTxt:'#fff',labelTxt:'#00522a',labelBg:'rgba(0,165,80,0.15)'},
   pelayanan: {fill:'rgba(26,111,216,0.22)',stroke:'#1a6fd8',numBg:'#1a6fd8',numTxt:'#fff',labelTxt:'#042c53',labelBg:'rgba(220,238,255,0.90)'},
   operasional:{fill:'rgba(232,101,10,0.22)',stroke:'#e8650a',numBg:'#e8650a',numTxt:'#fff',labelTxt:'#7a2d00',labelBg:'rgba(255,240,230,0.90)'},
 };
 const TC_KOSONG={
-  komersial:{fill:'rgba(20,83,45,0.45)',stroke:'#14532d',numBg:'#14532d',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(20,83,45,0.85)'},
+  komersial:{fill:'rgba(0,100,48,0.45)',stroke:'#006430',numBg:'#006430',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(0,100,48,0.85)'},
   pelayanan: {fill:'rgba(30,58,138,0.45)',stroke:'#1e3a8a',numBg:'#1e3a8a',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(30,58,138,0.85)'},
   operasional:{fill:'rgba(124,45,18,0.45)',stroke:'#7c2d12',numBg:'#7c2d12',numTxt:'#fff',labelTxt:'#fff',labelBg:'rgba(124,45,18,0.85)'},
 };
@@ -715,7 +714,7 @@ function polyA2(pts){let a=0;for(let i=0;i<pts.length;i++){const j=(i+1)%pts.len
 
 function mdown(e){
   const{x,y}=getCanvasPos(e);
-  if(tool==='select'){const h=hitTest(x,y);selId=h?h.id:null;redraw();if(h)showInfo(h);else closeInfo();}
+  if(tool==='select'){const h=hitTest(x,y);selId=h?h.id:null;redraw();if(h){showInfo(h);positionPopup(x,y);}else closeInfo();}
   else if(tool==='rect'){drawing=true;sx=x;sy=y;}
   else if(tool==='point'){
     const a={id:'a'+Date.now(),type:typ,shape:'point',x,y,w:0,h:0,nama:'',peruntukan:'',luas:'',lantai:'',penyewa:'',sewa:0,masaSewa:'',status:'aktif',catatan:''};
@@ -913,7 +912,29 @@ function showInfo(a){
       ${a.catatan?`<div class="ipr"><div class="ipl">Catatan</div><div class="ipv" style="font-size:11px;">${a.catatan}</div></div>`:''}`;
   }
   h+=`<div class="ipd"></div><button class="eabtn" onclick="openAM(cur.areas.find(x=>x.id==='${a.id}'))">✏ Edit Info Area</button>`;
-  document.getElementById('ipb').innerHTML=h;document.getElementById('ip').classList.remove('hidden');
+  document.getElementById('ipb').innerHTML=h;
+  const ip=document.getElementById('ip');
+  ip.classList.remove('hidden');
+  // Position will be set by positionPopup called from click handler
+}
+function positionPopup(canvasX, canvasY){
+  const ip=document.getElementById('ip');
+  const cwrap=document.getElementById('cwrap');
+  const cRect=cwrap.getBoundingClientRect();
+  const ipW=260, ipH=Math.min(ip.scrollHeight, window.innerHeight*0.7);
+  const scrollLeft=cwrap.scrollLeft, scrollTop=cwrap.scrollTop;
+  // Canvas position relative to cwrap (accounting for scroll)
+  let left = canvasX * scale - scrollLeft + 16;
+  let top = canvasY * scale - scrollTop - ipH/2;
+  // Keep inside cwrap bounds
+  const maxLeft = cwrap.clientWidth - ipW - 8;
+  const maxTop = cwrap.clientHeight - ipH - 8;
+  if(left > maxLeft) left = canvasX * scale - scrollLeft - ipW - 16;
+  if(left < 8) left = 8;
+  if(top < 8) top = 8;
+  if(top > maxTop) top = maxTop;
+  ip.style.left = left + 'px';
+  ip.style.top = top + 'px';
 }
 function closeInfo(){document.getElementById('ip').classList.add('hidden');}
 
@@ -986,7 +1007,21 @@ function buildList(){
   });
   document.getElementById('lcont').innerHTML=h;
 }
-function hlArea(id){selId=id;const a=cur.areas.find(x=>x.id===id);if(a){buildList();showInfo(a);switchTab('denah',document.getElementById('tab-d'));}}
+function hlArea(id){
+  selId=id;
+  const a=cur.areas.find(x=>x.id===id);
+  if(a){
+    buildList();
+    showInfo(a);
+    switchTab('denah',document.getElementById('tab-d'));
+    // Position popup at center of area
+    setTimeout(()=>{
+      if(a.shape==='point'){positionPopup(a.x,a.y);}
+      else if(a.shape==='poly'&&a.points){const c=polyCen(a.points.map(p=>({x:p.x*scale,y:p.y*scale})));positionPopup(c.x/scale,c.y/scale);}
+      else{positionPopup(a.x+a.w/2,a.y+a.h/2);}
+    },50);
+  }
+}
 function qdel(id){if(!IS_WRITER)return;if(!confirm('Hapus area ini?'))return;cur.areas=cur.areas.filter(a=>a.id!==id);save();buildList();redraw();}
 function exportExcel(){
   if(typeof XLSX==='undefined'){alert('Library Excel belum siap, coba lagi sebentar.');return;}
