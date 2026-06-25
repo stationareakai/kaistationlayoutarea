@@ -57,7 +57,13 @@
   --c-orange:#e8650a;--c-orange-f:rgba(232,101,10,0.22);--c-orange-l:#fff0e6;--c-orange-t:#7a2d00;
 }
 .app{display:flex;height:700px;border-radius:12px;overflow:hidden;background:var(--kbg);border:1.5px solid var(--kbd2);}
-.sidebar{width:210px;flex-shrink:0;background:var(--ksb);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar{width:210px;flex-shrink:0;background:var(--ksb);display:flex;flex-direction:column;overflow:hidden;transition:width 0.25s cubic-bezier(.4,0,.2,1),min-width 0.25s;position:relative;z-index:10;}
+.sidebar.collapsed{width:0;min-width:0;}
+.sb-toggle{position:absolute;top:50%;left:210px;transform:translateY(-50%);width:16px;height:48px;background:var(--ksb);border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:11;transition:left 0.25s cubic-bezier(.4,0,.2,1);box-shadow:2px 0 6px rgba(0,0,0,0.15);}
+.sidebar.collapsed .sb-toggle{left:0;}
+.sb-toggle-arrow{font-size:10px;color:rgba(255,255,255,0.7);transition:transform 0.25s;}
+.sidebar.collapsed .sb-toggle-arrow{transform:rotate(180deg);}
+.sb-edge{position:fixed;left:0;top:0;width:12px;height:100%;z-index:9;cursor:pointer;}
 .sb-logo{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
 .lm{width:34px;height:34px;background:var(--ko);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .lm svg{width:20px;height:20px;fill:#fff;}
@@ -217,10 +223,23 @@
 </style>
 
 <div class="app" id="app" style="position:relative;">
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
+  <div class="sb-toggle" id="sbToggle" onclick="toggleSidebar()"><span class="sb-toggle-arrow">‹</span></div>
+  <div class="sb-edge" id="sbEdge" onmouseenter="openSidebar()"></div>
   <div class="sb-logo">
-    <div class="lm"><svg viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 4h16v8H4V8zm2 2v4h12v-4H6zm-2 8h16v2H4v-2z"/></svg></div>
-    <div><div class="lt">KAI Asset</div><div class="ls">Denah Stasiun</div></div>
+    <div class="lm" style="background:transparent;padding:0;width:auto;height:auto;">
+      <svg viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg" width="72" height="29">
+        <!-- Background merah KAI -->
+        <rect width="120" height="48" rx="6" fill="#E8001C"/>
+        <!-- Huruf K -->
+        <text x="8" y="36" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#fff">K</text>
+        <!-- Huruf A -->
+        <text x="42" y="36" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#fff">A</text>
+        <!-- Huruf I -->
+        <text x="88" y="36" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#fff">I</text>
+      </svg>
+    </div>
+    <div><div class="lt" style="font-size:13px;font-weight:600;">Denah Stasiun</div></div>
   </div>
   <div class="sb-search"><input type="text" placeholder="Cari stasiun..." oninput="filterNav(this.value)"></div>
   <div class="sb-body" id="sb-body"></div>
