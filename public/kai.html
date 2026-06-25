@@ -212,7 +212,7 @@
 .bd{background:var(--kbl);color:var(--kb);}.bv{background:#ede9fe;color:#4c1d95;}
 .dc h4{font-size:11px;font-weight:500;color:var(--kt);margin-bottom:1px;}.dc p{font-size:10px;color:var(--kt3);}
 </style>
-  
+
 <div class="app" id="app" style="position:relative;">
 <div class="sidebar">
   <div class="sb-logo">
@@ -230,6 +230,8 @@
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="tbp" onclick="goHome()">⌂ Beranda</button>
       <button class="tbp" onclick="exportJSON()">↓ Export JSON</button>
+      <button class="tbp" onclick="triggerImportJSON()" id="importBtn" style="display:none;">↑ Import JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(this)">
       <div id="userChip" class="uchip" style="display:none;"><span id="userEmail">—</span><span id="userRole" class="rb viewer">viewer</span></div>
       <button class="lobtn" id="adminBtn" onclick="openAdminPanel()" style="display:none;background:linear-gradient(135deg,#1d4ed8,#4338ca);color:#fff;border:0;">👥 Kelola User</button>
       <button class="lobtn" onclick="logout()">Logout</button>
@@ -1070,6 +1072,46 @@ function addStn(){
   stations.push(s);save();buildNav();buildDash();closeM('ms');openStn(s.id);
 }
 function exportJSON(){if(!cur){alert('Pilih stasiun dulu.');return;}const b=new Blob([JSON.stringify(cur,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(cur.code||'stn')+'.json';a.click();}
+function exportAllJSON(){const b=new Blob([JSON.stringify(stations,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kai_all_stations_'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+function triggerImportJSON(){if(!IS_WRITER){showReadOnly();return;}document.getElementById('importFile').value='';document.getElementById('importFile').click();}
+function importJSON(inp){
+  if(!IS_WRITER){showReadOnly();return;}
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      // Support single station object or array of stations
+      if(Array.isArray(parsed)){
+        if(!confirm('Import '+parsed.length+' stasiun? Data yang sudah ada akan digabung (tidak ditimpa).'))return;
+        let added=0;
+        parsed.forEach(s=>{
+          if(s.id && s.name){
+            const exists=stations.find(x=>x.id===s.id);
+            if(!exists){stations.push(s);added++;}
+            else{Object.assign(exists,s);}
+          }
+        });
+        save();buildNav();buildDash();
+        alert('Import berhasil! '+added+' stasiun baru ditambahkan.');
+      } else if(parsed.id && parsed.name){
+        const exists=stations.find(x=>x.id===parsed.id);
+        if(exists){
+          if(!confirm('Stasiun '+parsed.name+' sudah ada. Timpa dengan data dari file?'))return;
+          Object.assign(exists,parsed);
+        } else {
+          stations.push(parsed);
+        }
+        save();buildNav();buildDash();
+        alert('Import berhasil: '+parsed.name);
+        openStn(parsed.id);
+      } else {
+        alert('Format JSON tidak dikenali. Pastikan file dari Export JSON app ini.');
+      }
+    }catch(err){alert('Gagal membaca file: '+err.message);}
+  };
+  r.readAsText(f);
+}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.mbg').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 
@@ -1102,6 +1144,8 @@ async function bootstrap(){
   }
   const adminBtn=document.getElementById('adminBtn');
   if(adminBtn && IS_ADMIN) adminBtn.style.display='inline-flex';
+  const importBtn=document.getElementById('importBtn');
+  if(importBtn && IS_WRITER) importBtn.style.display='inline-flex';
   // Load shared data
   const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
   if(error){console.error(error);}
