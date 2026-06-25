@@ -228,15 +228,15 @@
   <div class="sb-edge" id="sbEdge" onmouseenter="openSidebar()"></div>
   <div class="sb-logo">
     <div class="lm" style="background:transparent;padding:0;width:auto;height:auto;">
-      <svg viewBox="0 0 120 48" xmlns="http://www.w3.org/2000/svg" width="72" height="29">
-        <!-- Background merah KAI -->
-        <rect width="120" height="48" rx="6" fill="#E8001C"/>
-        <!-- Huruf K -->
-        <text x="8" y="36" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#fff">K</text>
-        <!-- Huruf A -->
-        <text x="42" y="36" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#fff">A</text>
-        <!-- Huruf I -->
-        <text x="88" y="36" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="34" fill="#fff">I</text>
+      <svg viewBox="0 0 90 38" xmlns="http://www.w3.org/2000/svg" width="80" height="34">
+        <!-- K biru -->
+        <text x="0" y="30" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="32" fill="#1B2D8F">K</text>
+        <!-- A biru -->
+        <text x="34" y="30" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="32" fill="#1B2D8F">A</text>
+        <!-- I biru -->
+        <text x="68" y="30" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="32" fill="#1B2D8F">I</text>
+        <!-- Garis oranye diagonal (slash KAI) -->
+        <line x1="18" y1="2" x2="52" y2="36" stroke="#F47920" stroke-width="4" stroke-linecap="round"/>
       </svg>
     </div>
     <div><div class="lt" style="font-size:13px;font-weight:600;">Denah Stasiun</div></div>
@@ -1300,6 +1300,46 @@ async function bootstrap(){
   sb.auth.onAuthStateChange((e,s)=>{ if(e==='SIGNED_OUT'||!s){gotoAuth();} });
 }
 bootstrap();
+
+// ===== Sidebar toggle =====
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+  updateEdge();
+}
+function openSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.remove('collapsed');
+  updateEdge();
+}
+function closeSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.add('collapsed');
+  updateEdge();
+}
+function updateEdge(){
+  const sb=document.getElementById('sidebar');
+  const edge=document.getElementById('sbEdge');
+  if(edge) edge.style.display=sb.classList.contains('collapsed')?'block':'none';
+}
+
+// Auto-close sidebar saat kursor keluar dari sidebar ke kanan
+document.addEventListener('DOMContentLoaded',()=>{
+  updateEdge();
+  const sb=document.getElementById('sidebar');
+  sb.addEventListener('mouseleave',(e)=>{
+    // Hanya tutup jika kursor menuju ke kanan (bukan ke toggle button)
+    if(e.clientX > sb.getBoundingClientRect().right - 20){
+      closeSidebar();
+    }
+  });
+  // Buka sidebar saat kursor ke ujung kiri layar
+  document.addEventListener('mousemove',(e)=>{
+    if(e.clientX <= 4){
+      openSidebar();
+    }
+  });
+});
 </script>
 
 </body>
