@@ -526,8 +526,10 @@ function showReadOnly(){
   document.body.appendChild(b);
 }
 function save(){
-  if(!IS_WRITER){
-    showReadOnly();
+  if(!IS_WRITER){showReadOnly();return;}
+  // PROTEKSI: jangan pernah save array kosong ke Supabase
+  if(!stations || stations.length===0){
+    console.warn('Save dibatalkan: stations kosong, data tidak akan ditimpa.');
     return;
   }
   clearTimeout(SAVE_TIMER);
@@ -1289,12 +1291,18 @@ async function bootstrap(){
   // Load shared data
   const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
   if(error){console.error(error);}
-  if(row && Array.isArray(row.data) && row.data.length){stations=row.data;}
-  else{
-    stations=JSON.parse(JSON.stringify(DEFAULT_STATIONS));
+  if(row && Array.isArray(row.data) && row.data.length){
+    // Data ada di Supabase - gunakan data tersebut
+    stations=row.data;
+  } else if(!row){
+    // Baris belum ada sama sekali - buat baris awal kosong tanpa data default
+    stations=[];
     if(IS_WRITER){
-      try{ await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:user.id}); }catch(_){}
+      try{ await sb.from('station_data').upsert({id:1,data:[],updated_at:new Date().toISOString(),updated_by:user.id}); }catch(_){}
     }
+  } else {
+    // Baris ada tapi data kosong [] - JANGAN timpa, muat apa adanya
+    stations=[];
   }
   if(!IS_WRITER){showReadOnly();}
   buildNav();buildDash();
