@@ -256,6 +256,8 @@
       <button class="tbp" onclick="goHome()">⌂ Beranda</button>
       <button class="tbp" onclick="exportJSON()">↓ Export JSON</button>
       <button class="tbp" onclick="triggerImportJSON()" id="importBtn" style="display:none;">↑ Import JSON</button>
+      <button class="tbp" onclick="saveBackup().then(()=>alert('Backup tersimpan!'))" id="backupBtn" style="display:none;">💾 Backup</button>
+      <button class="tbp" onclick="openBackupPanel()" id="restoreBtn" style="display:none;">↺ Restore</button>
       <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(this)">
       <div id="userChip" class="uchip" style="display:none;"><span id="userEmail">—</span><span id="userRole" class="rb viewer">viewer</span></div>
       <button class="lobtn" id="adminBtn" onclick="openAdminPanel()" style="display:none;background:linear-gradient(135deg,#1d4ed8,#4338ca);color:#fff;border:0;">👥 Kelola User</button>
@@ -537,8 +539,93 @@ function save(){
     try{
       const {error}=await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:CURRENT_USER?.id||null});
       if(error){console.error('Save error',error);alert('Gagal menyimpan: '+error.message);}
+      else{
+        // Auto backup setiap 10 save
+        if(!window._saveCount) window._saveCount=0;
+        window._saveCount++;
+        if(window._saveCount % 10 === 0) saveBackup();
+      }
     }catch(e){console.error(e);}
   },400);
+}
+
+// ===== Backup otomatis =====
+const MAX_BACKUPS = 10;
+async function saveBackup(){
+  if(!IS_WRITER || !stations || stations.length===0) return;
+  try{
+    const {data:existing}=await sb.from('station_backup').select('id,created_at').order('created_at',{ascending:true});
+    // Hapus backup lama kalau sudah > MAX_BACKUPS
+    if(existing && existing.length >= MAX_BACKUPS){
+      const toDelete=existing.slice(0, existing.length - MAX_BACKUPS + 1);
+      for(const b of toDelete){
+        await sb.from('station_backup').delete().eq('id',b.id);
+      }
+    }
+    await sb.from('station_backup').insert({
+      data:stations,
+      saved_by:CURRENT_USER?.id||null,
+      note:`Auto backup — ${new Date().toLocaleString('id-ID')}`
+    });
+    console.log('Backup otomatis tersimpan');
+  }catch(e){console.warn('Backup gagal:',e);}
+}
+
+// Backup setiap 5 menit sekali selama ada aktivitas
+let lastActivity=Date.now();
+document.addEventListener('mousemove',()=>lastActivity=Date.now());
+setInterval(()=>{
+  if(Date.now()-lastActivity < 5*60*1000 && stations.length>0){
+    saveBackup();
+  }
+},5*60*1000);
+
+// Backup saat user mau tutup/refresh tab
+window.addEventListener('beforeunload',()=>{
+  if(stations.length>0){
+    navigator.sendBeacon && navigator.sendBeacon('/api/noop'); // trigger agar tab tidak langsung tutup
+    saveBackup();
+  }
+});
+
+async function listBackups(){
+  const {data}=await sb.from('station_backup').select('id,created_at,note').order('created_at',{ascending:false}).limit(10);
+  return data||[];
+}
+async function restoreBackup(id){
+  if(!confirm('Restore data dari backup ini? Data saat ini akan ditimpa.'))return;
+  const {data}=await sb.from('station_backup').select('data').eq('id',id).single();
+  if(data && Array.isArray(data.data) && data.data.length){
+    stations=data.data;
+    await sb.from('station_data').upsert({id:1,data:stations,updated_at:new Date().toISOString(),updated_by:CURRENT_USER?.id||null});
+    buildNav();buildDash();
+    alert('Data berhasil di-restore!');
+  }
+}
+async function openBackupPanel(){
+  const backups=await listBackups();
+  if(!backups.length){alert('Belum ada backup tersimpan.');return;}
+  let html='<div style="font-family:sans-serif;max-width:480px;">';
+  html+='<h3 style="margin:0 0 12px;color:#1B2D8F;">Riwayat Backup</h3>';
+  html+='<p style="font-size:12px;color:#666;margin:0 0 10px;">Pilih backup untuk restore data:</p>';
+  backups.forEach((b,i)=>{
+    const tgl=new Date(b.created_at).toLocaleString('id-ID');
+    html+=`<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div><div style="font-size:13px;font-weight:600;color:#1e293b;">${b.note||'Backup #'+(i+1)}</div>
+      <div style="font-size:11px;color:#64748b;">${tgl}</div></div>
+      <button onclick="restoreBackup('${b.id}');this.closest('.bkp-modal').remove();" 
+        style="padding:4px 10px;background:#1B2D8F;color:#fff;border:0;border-radius:6px;font-size:11px;cursor:pointer;">Restore</button>
+    </div>`;
+  });
+  html+='</div>';
+  const modal=document.createElement('div');
+  modal.className='bkp-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML=`<div style="background:#fff;border-radius:12px;padding:20px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">
+    ${html}
+    <button onclick="this.closest('.bkp-modal').remove()" style="margin-top:8px;padding:6px 16px;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:12px;">Tutup</button>
+  </div>`;
+  document.body.appendChild(modal);
 }
 
 // ===== Admin user management =====
@@ -1288,6 +1375,10 @@ async function bootstrap(){
   if(adminBtn && IS_ADMIN) adminBtn.style.display='inline-flex';
   const importBtn=document.getElementById('importBtn');
   if(importBtn && IS_WRITER) importBtn.style.display='inline-flex';
+  const backupBtn=document.getElementById('backupBtn');
+  if(backupBtn && IS_ADMIN) backupBtn.style.display='inline-flex';
+  const restoreBtn=document.getElementById('restoreBtn');
+  if(restoreBtn && IS_ADMIN) restoreBtn.style.display='inline-flex';
   // Load shared data
   const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
   if(error){console.error(error);}
