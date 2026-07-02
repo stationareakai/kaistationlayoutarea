@@ -1381,19 +1381,23 @@ async function bootstrap(){
   if(restoreBtn && IS_ADMIN) restoreBtn.style.display='inline-flex';
   // Load shared data
   const {data:row,error}=await sb.from('station_data').select('data').eq('id',1).maybeSingle();
-  if(error){console.error(error);}
+  if(error){
+    // JANGAN lanjutkan / timpa data jika gagal load - bisa menghapus data existing
+    console.error('Load error',error);
+    alert('Gagal memuat data dari server:\n'+error.message+'\n\nAplikasi akan berhenti dalam mode aman untuk mencegah kehilangan data. Silakan refresh halaman.');
+    stations=[];
+    LOAD_FAILED=true;
+    return;
+  }
   if(row && Array.isArray(row.data) && row.data.length){
-    // Data ada di Supabase - gunakan data tersebut
     stations=row.data;
-  } else if(!row){
-    // Baris belum ada sama sekali - buat baris awal kosong tanpa data default
+  } else if(row){
+    // Baris ada tapi kosong - muat apa adanya, jangan timpa
     stations=[];
-    if(IS_WRITER){
-      try{ await sb.from('station_data').upsert({id:1,data:[],updated_at:new Date().toISOString(),updated_by:user.id}); }catch(_){}
-    }
   } else {
-    // Baris ada tapi data kosong [] - JANGAN timpa, muat apa adanya
+    // Baris belum ada sama sekali - HANYA buat baris awal jika benar-benar tidak ada error
     stations=[];
+    // JANGAN auto-upsert empty; biarkan save pertama nanti yang membuat baris
   }
   if(!IS_WRITER){showReadOnly();}
   buildNav();buildDash();
