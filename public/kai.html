@@ -518,7 +518,7 @@ let stations=[];
 const SB_URL='https://rpaflethpjfawdpsoegn.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwYWZsZXRocGpmYXdkcHNvZWduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTA5NzEsImV4cCI6MjA5NzkyNjk3MX0.J_lfdTdMdwb4_k3bF5oeGn70gV4drLfaxSSCy05-a-4';
 const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storage:localStorage,persistSession:true,autoRefreshToken:true}});
-let CURRENT_USER=null, IS_ADMIN=false, IS_EDITOR=false, IS_WRITER=false, MY_ROLE='', SAVE_TIMER=null;
+let CURRENT_USER=null, IS_ADMIN=false, IS_EDITOR=false, IS_WRITER=false, MY_ROLE='', SAVE_TIMER=null, LOAD_FAILED=false;
 function gotoAuth(){ try{ window.top.location='/auth'; }catch(_){ window.location='/auth'; } }
 async function logout(){ try{ await sb.auth.signOut(); }catch(_){} gotoAuth(); }
 function showReadOnly(){
