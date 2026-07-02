@@ -515,8 +515,8 @@ const DEFAULT_STATIONS=[
 let stations=[];
 
 // ============== Cloud storage (Lovable Cloud) ==============
-const SB_URL='https://sagjjbkcwiafzuwbjrve.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZ2pqYmtjd2lhZnp1d2JqcnZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MDQ5ODUsImV4cCI6MjA5NjQ4MDk4NX0.ou2rrQ-juuKYIEY0U2jF3ZTNTDstkO8Q32kp_dZt5G4';
+const SB_URL='https://rpaflethpjfawdpsoegn.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwYWZsZXRocGpmYXdkcHNvZWduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTA5NzEsImV4cCI6MjA5NzkyNjk3MX0.J_lfdTdMdwb4_k3bF5oeGn70gV4drLfaxSSCy05-a-4';
 const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storage:localStorage,persistSession:true,autoRefreshToken:true}});
 let CURRENT_USER=null, IS_ADMIN=false, IS_EDITOR=false, IS_WRITER=false, MY_ROLE='', SAVE_TIMER=null;
 function gotoAuth(){ try{ window.top.location='/auth'; }catch(_){ window.location='/auth'; } }
