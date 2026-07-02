@@ -529,7 +529,9 @@ function showReadOnly(){
 }
 function save(){
   if(!IS_WRITER){showReadOnly();return;}
-  // PROTEKSI: jangan pernah save array kosong ke Supabase
+  // PROTEKSI 1: jangan simpan jika load awal gagal (mencegah menimpa data server dgn state kosong)
+  if(LOAD_FAILED){console.warn('Save dibatalkan: load awal gagal.');return;}
+  // PROTEKSI 2: jangan simpan array kosong
   if(!stations || stations.length===0){
     console.warn('Save dibatalkan: stations kosong, data tidak akan ditimpa.');
     return;
